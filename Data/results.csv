@@ -1,0 +1,40 @@
+date,module,topic,score,total,seconds
+2025-11-21,maths,Maths,9,10,165
+2025-11-21,vocabulary,Vocabulary,10,10,57
+2025-11-21,verbal_reasoning,Verbal Reasoning,7,10,161
+2025-11-21,nvr,NVR,5,10,151
+2025-11-21,mixed,Mixed (All available),8,10,98
+2025-11-22,maths,Maths,10,15,886
+2025-11-22,vocabulary,Vocabulary,14,15,149
+2025-11-22,verbal_reasoning,Verbal Reasoning,12,15,411
+2025-11-22,nvr,NVR,9,15,308
+2025-11-22,mixed,Mixed (All available),8,15,287
+2025-11-23,maths,Maths,5,10,125
+2025-11-23,vocabulary,Vocabulary,12,25,180
+2025-11-23,verbal_reasoning,Verbal Reasoning,10,10,174
+2025-11-24,maths,Maths,5,10,80
+2025-11-24,vocabulary,Vocabulary,11,16,147
+2025-11-24,verbal_reasoning,Verbal Reasoning,11,15,158
+2025-11-24,nvr,NVR,6,15,188
+2025-11-25,maths,Maths,4,15,125
+2025-11-25,vocabulary,Vocabulary,12,15,111
+2025-11-25,verbal_reasoning,Verbal Reasoning,11,15,159
+2025-11-25,nvr,NVR,10,15,175
+2025-11-25,mixed,Mixed (All available),6,15,113
+2025-11-26,maths,Maths,5,15,152
+2025-11-26,vocabulary,Vocabulary,8,15,133
+2025-11-26,verbal_reasoning,Verbal Reasoning,10,15,237
+2025-11-26,nvr,NVR,7,15,235
+2025-11-26,mixed,Mixed (All available),10,15,118
+2025-11-28,nvr,NVR,4,10,241
+2025-11-30,maths,Maths,2,15,147
+2025-11-30,vocabulary,Vocabulary,14,15,173
+2025-11-30,verbal_reasoning,Verbal Reasoning,12,15,227
+2025-12-03,maths,Maths,4,15,236
+2025-12-03,vocabulary,Vocabulary,11,15,231
+2025-12-03,maths,Maths,6,10,160
+2025-12-05,maths,Maths,8,15,244
+2025-12-05,vocabulary,Vocabulary,11,15,149
+2025-12-05,verbal_reasoning,Verbal Reasoning,17,22,227
+2025-12-05,nvr,NVR,5,15,232
+2025-12-05,mixed,Mixed (All available),10,15,92

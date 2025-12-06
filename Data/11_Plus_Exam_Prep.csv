@@ -1,0 +1,200 @@
+Type,Question,Option1,Option2,Option3,Option4,Answer
+Maths,468 + 237 = ?,695,705,715,725,705
+Maths,804 − 389 = ?,415,425,435,445,415
+Maths,36 × 7 = ?,242,252,262,272,252
+Maths,96 ÷ 8 = ?,10,11,12,13,12
+Maths,What is 3/5 of 40?,18,20,22,24,24
+Maths,"If x + 27 = 84, what is x?",47,57,67,77,57
+Maths,A rectangle perimeter is 30 cm. One side is 8 cm. What is the other side?,6,7,8,9,7
+Maths,2.4 + 0.75 = ?,3.05,3.1,3.15,3.2,3.15
+Maths,5.6 − 2.9 = ?,2.5,2.6,2.7,2.8,2.7
+Maths,"Round 4,987 to the nearest hundred.","4,900","5,000","4,990","4,950","5,000"
+Maths,A book costs £6.75. You buy 3 books and pay with £25. How much change?,£3.25,£4.75,£5.75,£2.75,£4.75
+Maths,A train leaves at 09:35 and arrives at 11:12. Journey length?,1h 27m,1h 37m,1h 42m,1h 47m,1h 37m
+Maths,15% of 200 = ?,25,30,35,40,30
+Maths,"The average (mean) of 6, 8, 10, 12 = ?",8,9,10,11,9
+Maths,Which is larger: 3/8 or 1/3?,03-Aug,01-Mar,Equal,Cannot tell,03-Aug
+Maths,72 ÷ 6 = ?,10,11,12,13,12
+Maths,7 × 9 = ?,56,61,63,72,63
+Maths,"Find the missing number: 3, 6, 9, __, 15",10,11,12,13,12
+Maths,What is 25% of 64?,12,14,16,18,16
+Maths,Convert 2.5 hours into minutes.,120,130,140,150,150
+Maths,The area of a rectangle is 48 cm². One side is 6 cm. The other side?,6,7,8,9,8
+Maths,A packet has 24 sweets. You give away 1/3. How many left?,12,14,16,18,16
+Maths,Write 0.75 as a fraction (simplest form).,  3/8 ,  1/3 ,Equal,Cannot tell, 3/8
+Maths,"The difference between 1,005 and 987 is?",16,17,18,19,18
+Maths,"If a = 4 and b = 7, find 3a + 2b.",26,29,32,34,26
+Non-Verbal-Reasoning,"Sequence of shapes: circle, square, triangle, circle, square, __",triangle,circle,square,hexagon,triangle
+Non-Verbal-Reasoning,"Rotation: A shape points up, then right, then down. What direction next?",left,up,right,down,left
+Non-Verbal-Reasoning,"Mirror: If the letter 'L' is reflected in a vertical mirror, which looks correct?",┐,└,┘,┌,┐
+Non-Verbal-Reasoning,"Odd one out: filled circle, empty circle, filled square, filled triangle",filled circle,empty circle,filled square,filled triangle,empty circle
+Non-Verbal-Reasoning,"Size pattern: small, medium, large, small, medium, __",large,small,medium,extra large,large
+Non-Verbal-Reasoning,"Shading alternates: shaded, unshaded, shaded, __",shaded,unshaded,half shaded,striped,unshaded
+Non-Verbal-Reasoning,"Count sides: triangle, square, pentagon, __",hexagon,circle,octagon,heptagon,hexagon
+Non-Verbal-Reasoning,"Which pair are reflections of each other: ▲ and ▲ mirrored, ◯ and ◯ mirrored, □ and □ mirrored, ▽ and ◯ mirrored",first pair,second pair,third pair,fourth pair,first pair
+Non-Verbal-Reasoning,"Sequence of numbers mapped to shapes: circle=1, square=2, triangle=3. What is the sequence for triangle, circle, square?","3,1,2","1,2,3","2,3,1","3,2,1","3,1,2"
+Non-Verbal-Reasoning,"Rotation by 90° clockwise each step: if step 1 points up, where does it point at step 3?",left,right,down,up,down
+Non-Verbal-Reasoning,"Pattern: two small dots then one large dot, repeat. After 5 items what is next?",small dot,large dot,two small dots,medium dot,large dot
+Non-Verbal-Reasoning,"Which completes the grid pattern: top-left filled, top-right empty, bottom-left empty, bottom-right __",filled,empty,half filled,striped,filled
+Non-Verbal-Reasoning,"Odd one out: rotating square, reflecting square, shifting square, scaling square",rotating square,reflecting square,shifting square,scaling square,scaling square
+Non-Verbal-Reasoning,"If a shape turns 180°, which of these is same as original?",circle,triangle,arrow shape,letter L,circle
+Non-Verbal-Reasoning,"Which comes next in sequence of corners: 1, 2, 3, 4, __",5,6,1,4,5
+Non-Verbal-Reasoning,Symmetry: which shape has vertical symmetry?,heart shape,letter A,letter K,letter F,letter A
+Non-Verbal-Reasoning,"If patterns alternate between diagonal lines and horizontal lines, what follows diagonal, horizontal, diagonal, __",horizontal,diagonal,checker,blank,horizontal
+Non-Verbal-Reasoning,Which figure is the mirror image of 'R' across a vertical axis?,a backward R,an upside-down R,same R,rotated R,a backward R
+Non-Verbal-Reasoning,A net shows six squares in a cross. Which two faces are opposite when folded into a cube?,centre and opposite arm,adjacent arms,corner and centre,two adjacent arms,centre and opposite arm
+Non-Verbal-Reasoning,Count number of triangles in a simple triangular arrangement of 4 small triangles forming a larger one.,4,5,3,1,4
+Non-Verbal-Reasoning,Which shape does NOT belong if rule is 'exactly four equal sides'?,square,rhombus,rectangle,isosceles triangle,isosceles triangle
+Non-Verbal-Reasoning,Rotation vs reflection: which transformation changes clockwise ordering but keeps overall orientation?,rotation,reflection,translation,scaling,reflection
+Non-Verbal-Reasoning,"Pattern of arrows: →, ↓, ←, ↑, →, __",↓,←,↑,→,↓
+Non-Verbal-Reasoning,"A 2×2 block alternates colours: black, white, black, white. After flipping horizontally what is top-left colour?",white,black,grey,unchanged,white
+Non-Verbal-Reasoning,"Which two shapes will overlap exactly if one is rotated 90°: rectangle 2×4 and rectangle 4×2, square 3×3 and square 3×3, triangle and its mirror, circle and oval",first pair,second pair,third pair,fourth pair,first pair
+Verbal Reasoning,"Find the odd one out: oak, pine, maple, stone",oak,pine,maple,stone,stone
+Verbal Reasoning,Complete the analogy: hand is to glove as foot is to ____,sock,shoe,socke,mitt,shoe
+Verbal Reasoning,"Letter sequence: What comes next? B, D, F, H, __",J,I,K,L,J
+Verbal Reasoning,"Insert the pair of letters that fits both: CA( )ER, BA( )ET",T;N,R;T,T,CH,T
+Verbal Reasoning,Rearrange the letters to make a word: RTAEHC,CATHER,CHATER,TEACHR,TEACHER,TEACHER
+Verbal Reasoning,"Which two words are closest in meaning: brave, timid, valiant, meek, bold",brave and timid,valiant and meek,valiant and bold,timid and meek,valiant and bold
+Verbal Reasoning,"Code: If CAT -> DBU (each letter +1), then DOG -> ____",EPH,COH,EPG,EPH,EPH
+Verbal Reasoning,What is the 15th letter of the alphabet?,O,P,N,M,O
+Verbal Reasoning,"How many 3-letter words can be formed from A,R,T without repeating letters?",3,6,9,12,6
+Verbal Reasoning,Logic: All squares are rectangles. All rectangles are quadrilaterals. Are all squares quadrilaterals?,Yes,No,Only some,Cannot tell,Yes
+Verbal Reasoning,Hidden word: Find the animal hidden in 'eaglE SOars',eagle,goat,seal,rat,eagle
+Verbal Reasoning,Complete the compound: rain + ____ = a weather event,bow,coat,fall,storm,bow
+Verbal Reasoning,"Which word does NOT belong: cotton, wool, silk, iron",cotton,wool,silk,iron,iron
+Verbal Reasoning,Analogy: book is to reading as spoon is to ____,cooking,eating,stirring,writing,eating
+Verbal Reasoning,Choose the best antonym for 'generous',stingy,kind,helpful,giving,stingy
+Verbal Reasoning,"Find the missing number in pattern: 2, 6, 12, 20, __",30,24,28,36,30
+Verbal Reasoning,Which rearranged pair makes a real word: LISTEN -> SILENT is an example; which pair below is similar: NIGHT -> ______,THING,GNHIT,INHTG,TGNIH,THING
+Verbal Reasoning,"If every A is B and every B is C, then every A is C. This statement is:",TRUE,FALSE,Sometimes true,Cannot tell,TRUE
+Verbal Reasoning,Choose the word that completes the simile: as quiet as a ____,mouse,lion,storm,ocean,mouse
+Verbal Reasoning,"Which two words form an opposite pair: ascend, increase, descend, rise",ascend and descend,increase and rise,ascend and increase,rise and descend,ascend and descend
+Verbal Reasoning,"Find the odd pair: (cat:kitten), (dog:puppy), (horse:foal), (sheep:calf)",cat:kitten,dog:puppy,horse:foal,sheep:calf,sheep:calf
+Verbal Reasoning,"Complete the letter pair pattern: AB, CD, EF, __",GH,GI,HG,HJ,GH
+Verbal Reasoning,Word ladder clue: Change one letter in 'COLD' to make a word meaning 'not new',OLD,COLD,CORD,BOLD,OLD
+Verbal Reasoning,Find the best word to complete: He spoke very ____ so everyone understood.,clearly,clear,clearness,cleared,clearly
+Verbal Reasoning,Analogy: piano is to musician as brush is to ____,painter,dancer,singer,actor,painter
+Vocabulary,Choose the best synonym for 'abundant'.,scarce,plentiful,tiny,minimal,plentiful
+Vocabulary,Choose the best synonym for 'elated'.,joyful,fearful,angry,uncertain,joyful
+Vocabulary,Choose the best synonym for 'diligent'.,careless,thorough,lazy,clumsy,thorough
+Vocabulary,Choose the best antonym for 'cautious'.,reckless,careful,swift,bold,reckless
+Vocabulary,Choose the best synonym for 'adversity'.,ease,hardship,wealth,victory,hardship
+Vocabulary,Choose the best antonym for 'expand'.,enlarge,grow,contract,extend,contract
+Vocabulary,Choose the best antonym for 'hostile'.,friendly,angry,distant,icy,friendly
+Vocabulary,Choose the best synonym for 'tranquil'.,peaceful,loud,calm,quiet,peaceful
+Vocabulary,Choose the correct word: I can't ____ the invitation.,accept,except,accident,excerpt,accept
+Vocabulary,Choose the correct word: The dog chased ____ tail.,its,it's,its',its's,its
+Vocabulary,Pick the word that best completes the sentence: She was very ____ after winning the prize.,melancholy,ecstatic,lethargic,pensive,ecstatic
+Vocabulary,Which word is closest in meaning to 'timid'?,bold,shy,brave,valiant,shy
+Vocabulary,Which word is closest in meaning to 'gleaming'?,dull,shiny,murky,flat,shiny
+Vocabulary,"Choose the correct plural form: one analysis, two ____.",analysises,analyses,analysis,analysi,analyses
+Vocabulary,Which word is an antonym of 'optimistic'?,hopeful,pessimistic,positive,cheerful,pessimistic
+Vocabulary,Choose the word that best completes: He gave a very ____ explanation that everyone understood.,vague,clear,obscure,muddled,clear
+Vocabulary,Which of these words is spelled correctly?,accomodate,accommodate,acommodate,accommadate,accommodate
+Vocabulary,Choose the best synonym for 'fragile'.,delicate,strong,sturdy,robust,delicate
+Vocabulary,Choose the correct homophone: They will ____ the match if it rains.,postpone,post pon,postponee,post-pon,postpone
+Vocabulary,Pick the best word: The children were ____ by the magician's trick.,astonished,annoyed,bored,frightened,astonished
+Vocabulary,Choose the best antonym for 'scarce'.,rare,plentiful,limited,sparse,plentiful
+Vocabulary,Which word fits: A ____ of geese flew overhead.,flock,bunch,group,collection,flock
+Vocabulary,Choose the correct prefix to make the opposite of 'appear'.,re-,dis-,un-,mis-,dis-
+Vocabulary,Which word means 'able to be trusted'?,reliable,fragile,fleeting,ambiguous,reliable
+Vocabulary,Choose the best synonym for 'reluctant'.,eager,willing,hesitant,keen,hesitant
+Maths,What is 15 × 12?,170,180,190,200,180
+Maths,Simplify: 144 ÷ 12,10,11,12,13,12
+Maths,What is 7.5 × 4?,28,30,32,35,30
+Maths,"If 5x = 45, what is x?",8,9,10,11,9
+Maths,What is 3/4 of 80?,50,55,60,65,60
+Maths,Calculate: 15% of 300,35,40,45,50,45
+Maths,A triangle has base 10cm and height 8cm. What is its area?,30 cm²,35 cm²,40 cm²,45 cm²,40 cm²
+Maths,"What is the next number: 5, 10, 20, 40, __?",60,70,80,90,80
+Maths,Convert 3.25 hours to minutes.,180,185,190,195,195
+Maths,What is 8² + 6²?,90,95,100,105,100
+Maths,"If a = 6 and b = 8, what is a² + b²?",90,95,100,105,100
+Maths,What is 0.6 as a percentage?,6%,60%,66%,600%,60%
+Maths,A car travels 240 km in 3 hours. What is its speed?,60 km/h,70 km/h,80 km/h,90 km/h,80 km/h
+Maths,What is the product of 0.4 and 0.5?,0.02,0.2,2,20,0.2
+Maths,"Find the average of 12, 18, 24, 30",16,18,21,22,21
+Maths,What is 75% of 120?,80,85,90,95,90
+Maths,Solve: 3(x + 4) = 27,3,4,5,6,5
+Maths,What is the perimeter of a square with side 7cm?,24 cm,26 cm,28 cm,30 cm,28 cm
+Maths,What is 1.8 + 2.7?,4.3,4.4,4.5,4.6,4.5
+Maths,How many minutes in 1.75 hours?,100,105,110,115,105
+Maths,What is 13 × 13?,159,169,179,189,169
+Maths,What is 256 ÷ 16?,14,15,16,17,16
+Maths,"If y - 15 = 30, what is y?",40,45,50,55,45
+Maths,What is 2/3 of 90?,50,55,60,65,60
+Maths,What is 40% of 250?,90,95,100,105,100
+Non-Verbal-Reasoning,"Pattern: triangle, circle, square, triangle, circle, __",square,circle,triangle,hexagon,square
+Non-Verbal-Reasoning,"Rotation sequence: up, left, down, right, up, __",left,right,down,up,left
+Non-Verbal-Reasoning,Which shape has horizontal symmetry?,letter M,letter R,letter F,letter G,letter M
+Non-Verbal-Reasoning,"Odd one out: red triangle, blue triangle, green triangle, large triangle",red triangle,blue triangle,green triangle,large triangle,large triangle
+Non-Verbal-Reasoning,"Pattern: dot, line, dot, line, dot, __",line,dot,square,circle,line
+Non-Verbal-Reasoning,Which net makes a triangular prism?,Net A,Net B,Net C,Net D,Net B
+Non-Verbal-Reasoning,"Count corners: triangle (3), square (4), pentagon (5), hexagon (6), heptagon (__)",5,6,7,8,7
+Non-Verbal-Reasoning,Reflection: which is mirror of 'E'?,backward E,upside-down E,rotated E,same E,backward E
+Non-Verbal-Reasoning,"Pattern: thick line, thin line, thick line, thin line, __",thick line,thin line,medium line,dotted line,thick line
+Non-Verbal-Reasoning,Which shape is rotated 90° clockwise?,Shape A,Shape B,Shape C,Shape D,Shape C
+Non-Verbal-Reasoning,Odd one out: all have 4 corners except,rectangle,rhombus,trapezium,circle,circle
+Non-Verbal-Reasoning,"Sequence: star, circle, star, circle, star, __",circle,star,square,triangle,circle
+Non-Verbal-Reasoning,Which two shapes are congruent?,A and B,B and C,C and D,A and D,A and B
+Non-Verbal-Reasoning,"Pattern: shaded, striped, shaded, striped, __",shaded,striped,checkered,dotted,shaded
+Non-Verbal-Reasoning,"Rotation: starts facing north, turns 90° right, then 90° right again. Where now?",east,south,west,north,south
+Non-Verbal-Reasoning,Which shape cannot be made from the net?,cube,pyramid,cylinder,cone,pyramid
+Non-Verbal-Reasoning,"Pattern: small, large, medium, small, large, __",medium,small,large,extra large,medium
+Non-Verbal-Reasoning,Odd one out: all are 3D shapes except,cube,sphere,circle,cylinder,circle
+Non-Verbal-Reasoning,Which is the reflection over horizontal line?,Image A,Image B,Image C,Image D,Image B
+Non-Verbal-Reasoning,"Sequence: 1 line, 2 lines, 3 lines, 4 lines, __",5 lines,6 lines,7 lines,8 lines,5 lines
+Non-Verbal-Reasoning,"Pattern: upward arrow, downward arrow, left arrow, right arrow, upward arrow, __",downward arrow,left arrow,right arrow,upward arrow,downward arrow
+Non-Verbal-Reasoning,Which shape has no lines of symmetry?,scalene triangle,isosceles triangle,equilateral triangle,square,scalene triangle
+Non-Verbal-Reasoning,Count cubes in 3D shape: 3×3×2,16,17,18,19,18
+Non-Verbal-Reasoning,"Pattern: circle inside square, square inside triangle, triangle inside circle, circle inside square, __",square inside triangle,triangle inside circle,square inside circle,circle inside triangle,square inside triangle
+Verbal Reasoning,"Find the odd one out: river, mountain, ocean, desert, book",river,mountain,ocean,book,book
+Verbal Reasoning,Complete the analogy: teacher is to school as doctor is to ____,hospital,medicine,patient,stethoscope,hospital
+Verbal Reasoning,"Letter sequence: C, F, I, L, __",O,N,P,Q,O
+Verbal Reasoning,"Insert the missing letters: ST( )LE, MI( )LE",A;D,A;N,A;K,A;L,A;D
+Verbal Reasoning,Rearrange to make a word: NOMDE,DOMEN,MONDE,DEMON,NOMED,DEMON
+Verbal Reasoning,"Which two words are closest: happy, sad, joyful, miserable, angry",happy and sad,joyful and miserable,joyful and happy,sad and angry,joyful and happy
+Verbal Reasoning,"Code: If APPLE -> BQQMF (each letter +1), then BANANA -> ____",CBOBOB,CBONBN,COBONB,CBOBOC,CBOBOB
+Verbal Reasoning,What is the 8th letter of the alphabet?,G,H,F,E,H
+Verbal Reasoning,"How many 4-letter words from P, E, N, S?",12,16,20,24,24
+Verbal Reasoning,Logic: All mammals have fur. Whales are mammals. Do whales have fur?,Yes,No,Sometimes,Cannot tell,Yes
+Verbal Reasoning,Hidden word: find color in 'great ORANGE sunset',orange,green,blue,red,orange
+Verbal Reasoning,Complete the compound: sun + ____ = a time of day,rise,set,light,flower,set
+Verbal Reasoning,"Which doesn't belong: guitar, piano, violin, flute, drum",guitar,piano,violin,drum,drum
+Verbal Reasoning,Analogy: key is to lock as password is to ____,computer,security,account,login,account
+Verbal Reasoning,Choose the best antonym for 'victory',success,defeat,triumph,win,defeat
+Verbal Reasoning,"Find the missing number: 10, 20, 30, 40, __",50,55,60,65,50
+Verbal Reasoning,Which rearranged word: EARTH -> HEART; OCEAN -> ____,CANOE,OCEAN,AONCE,NEACO,CANOE
+Verbal Reasoning,"If some cats are black and all black animals are nocturnal, then some cats are nocturnal. True?",TRUE,FALSE,Sometimes,Cannot tell,TRUE
+Verbal Reasoning,Complete the simile: as busy as a ____,bee,sloth,turtle,rock,bee
+Verbal Reasoning,"Which two are opposites: love, hate, like, dislike, enjoy",love and hate,like and dislike,love and like,hate and dislike,love and hate
+Verbal Reasoning,"Find the odd pair: (cow:milk), (bee:honey), (sheep:wool), (tree:wood)",cow:milk,bee:honey,sheep:wool,tree:wood,tree:wood
+Verbal Reasoning,"Complete the pattern: XY, ZA, BC, __",DE,EF,FG,GH,DE
+Verbal Reasoning,Word ladder: change one letter in 'BEAR' to make a fruit,PEAR,BEER,BEAT,BEAD,PEAR
+Verbal Reasoning,Complete: She ran ____ to catch the bus.,quickly,quick,quicken,quickness,quickly
+Verbal Reasoning,Analogy: hammer is to carpenter as scalpel is to ____,doctor,surgeon,nurse,patient,surgeon
+Vocabulary,Choose the best synonym for 'rapid'.,slow,fast,steady,gradual,fast
+Vocabulary,Choose the best synonym for 'miserable'.,happy,joyful,sad,content,sad
+Vocabulary,Choose the best synonym for 'ancient'.,modern,old,new,current,old
+Vocabulary,Choose the best antonym for 'beautiful'.,pretty,ugly,lovely,attractive,ugly
+Vocabulary,Choose the best synonym for 'wisdom'.,knowledge,ignorance,stupidity,foolishness,knowledge
+Vocabulary,Choose the best antonym for 'arrive'.,come,leave,enter,approach,leave
+Vocabulary,Choose the best antonym for 'peaceful'.,calm,noisy,quiet,serene,noisy
+Vocabulary,Choose the best synonym for 'enormous'.,tiny,small,huge,minute,huge
+Vocabulary,Choose the correct word: Please ____ the door when you leave.,close,clothes,closing,closed,close
+Vocabulary,Choose the correct word: That book is ____.,their,there,they're,thier,theirs
+Vocabulary,Pick the best word: The mountain climber felt ____ when he reached the summit.,defeated,accomplished,disappointed,frustrated,accomplished
+Vocabulary,Which word is closest to 'famous'?,unknown,renowned,obscure,hidden,renowned
+Vocabulary,Which word is closest to 'sparkling'?,dull,shining,dark,matte,shining
+Vocabulary,"Choose the correct plural: one fungus, two ____.",fungus,funguses,fungi,fungae,fungi
+Vocabulary,Which word is an antonym of 'confident'?,sure,uncertain,positive,assured,uncertain
+Vocabulary,Choose the word that completes: The instructions were ____ and easy to follow.,confusing,clear,vague,complicated,clear
+Vocabulary,Which word is spelled correctly?,neccessary,necessary,necesary,nessessary,necessary
+Vocabulary,Choose the best synonym for 'wealthy'.,rich,poor,destitute,broke,rich
+Vocabulary,Choose the correct homophone: I need a ____ of paper.,peace,piece,peice,pace,piece
+Vocabulary,Pick the best word: The audience was ____ by the performance.,bored,unimpressed,captivated,distracted,captivated
+Vocabulary,Choose the best antonym for 'simple'.,easy,complex,basic,straightforward,complex
+Vocabulary,Which word fits: A ____ of fish swam by.,school,flock,herd,pack,school
+Vocabulary,Choose the correct prefix for the opposite of 'agree'.,re-,dis-,un-,mis-,dis-
+Vocabulary,Which word means 'full of energy'?,lethargic,tired,energetic,sleepy,energetic
+Vocabulary,Choose the best synonym for 'clever'.,smart,stupid,dull,slow,smart
