@@ -9,10 +9,3 @@ font = "sans serif"
 maxUploadSize = 50
 enableXsrfProtection = true
 enableCORS = true
-
-[client]
-showErrorDetails = true
-
-# Mobile optimization
-[browser]
-gatherUsageStats = false
