@@ -1,8 +1,33 @@
+# Python
 __pycache__/
-*.pyc
-.env
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
 venv/
 .venv/
-*.csv
+ENV/
+env.bak/
+venv.bak/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# OS
 .DS_Store
-results.csv
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Data files
+*.csv
+!data/11_Plus_Exam_Prep.csv  # Keep this CSV
+results.csv  # Ignore results.csv in root
+
+# Logs
+*.log
