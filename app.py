@@ -3,13 +3,11 @@ import os, random, csv, datetime, time
 import pandas as pd
 import numpy as np
 from typing import List, Dict, Any
-import plotly.graph_objects as go
-import plotly.express as px
 from datetime import timedelta
 from pathlib import Path
+import altair as alt
 
 # ---------- Configuration ----------
-# Use relative paths for deployment
 BASE_DIR = Path(__file__).parent
 DATA_DIR = BASE_DIR / "data"
 CSV_FILE = DATA_DIR / "11_Plus_Exam_Prep.csv"
@@ -21,22 +19,16 @@ TARGET_ACCURACY = 0.85  # 85%
 
 # ---------- File checking helper ----------
 def setup_directories():
-    """Handle directory setup - will work on Streamlit Cloud"""
     try:
-        # On Streamlit Cloud, the data directory should already exist
         if not DATA_DIR.exists():
-            # Try to create it if it doesn't exist
             DATA_DIR.mkdir(exist_ok=True)
     except Exception as e:
         st.warning(f"Note: {str(e)}")
-        # Continue anyway - Streamlit Cloud might handle this differently
 
-# Call this at startup
 setup_directories()
 
 # ---------- NVR Visual Enhancement Function ----------
 def enhance_nvr_display(text):
-    """Replace shape names with Unicode symbols"""
     shape_map = {
         'circle': '●',
         'square': '■',
@@ -87,7 +79,6 @@ def log_result(module, topic, score, total, seconds):
 
 # ---------- Data helpers ----------
 def check_csv_file() -> bool:
-    """Check if CSV file exists and has correct format"""
     if not CSV_FILE.exists():
         return False
     try:
@@ -154,7 +145,7 @@ def sanitize_results_file(path: Path) -> None:
 
         raw.to_csv(path, index=False, encoding="utf-8")
     except Exception as e:
-        pass  # Silently fail on Streamlit Cloud
+        pass
 
 def load_results(log_path: Path) -> pd.DataFrame:
     if not log_path.exists():
@@ -322,162 +313,150 @@ st.set_page_config(
 )
 
 # ---------- Mobile-Optimized CSS ----------
+# FIXED: Proper CSS injection with unsafe_allow_html=True
 st.markdown("""
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<style>
-/* Base mobile-first styles */
-.stApp {
-    background-color: #000000 !important;
-    color: #ffffff !important;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
+    <style>
+    .stApp {
+        background-color: #000000 !important;
+        color: #ffffff !important;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
 
-/* Touch-friendly buttons (44px minimum for touch targets) */
-.stButton > button {
-    background-color: #2E8B57 !important;
-    color: white !important;
-    border: none !important;
-    border-radius: 12px !important;
-    padding: 14px 20px !important;
-    font-size: 18px !important;
-    font-weight: 600 !important;
-    margin: 8px 0 !important;
-    min-height: 44px !important;
-    min-width: 44px !important;
-    width: 100% !important;
-    transition: all 0.2s ease !important;
-}
-
-.stButton > button:hover {
-    background-color: #3DA56C !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important;
-}
-
-/* Mobile-optimized radio buttons */
-.stRadio > div {
-    background: #1a1a1a !important;
-    border-radius: 12px !important;
-    padding: 16px !important;
-    margin: 12px 0 !important;
-    border: 2px solid #333 !important;
-}
-
-.stRadio > div > label {
-    font-size: 18px !important;
-    padding: 14px 0 !important;
-    margin: 4px 0 !important;
-    color: white !important;
-    display: flex !important;
-    align-items: center !important;
-    cursor: pointer !important;
-    min-height: 44px !important;
-}
-
-/* Responsive columns for mobile */
-@media (max-width: 768px) {
-    [data-testid="column"] {
+    .stButton > button {
+        background-color: #2E8B57 !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 14px 20px !important;
+        font-size: 18px !important;
+        font-weight: 600 !important;
+        margin: 8px 0 !important;
+        min-height: 44px !important;
+        min-width: 44px !important;
         width: 100% !important;
-        margin-bottom: 16px !important;
+        transition: all 0.2s ease !important;
     }
-    
-    h1 { font-size: 28px !important; }
-    h2 { font-size: 24px !important; }
-    h3 { font-size: 20px !important; }
-    
-    .stDataFrame {
-        font-size: 14px !important;
+
+    .stButton > button:hover {
+        background-color: #3DA56C !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important;
     }
-}
 
-/* Progress bar */
-.stProgress > div > div {
-    background-color: #2E8B57 !important;
-    height: 20px !important;
-    border-radius: 10px !important;
-}
+    .stRadio > div {
+        background: #1a1a1a !important;
+        border-radius: 12px !important;
+        padding: 16px !important;
+        margin: 12px 0 !important;
+        border: 2px solid #333 !important;
+    }
 
-/* Data tables */
-.dataframe {
-    background-color: #1a1a1a !important;
-    color: white !important;
-    border-radius: 12px !important;
-    overflow: hidden !important;
-}
+    .stRadio > div > label {
+        font-size: 18px !important;
+        padding: 14px 0 !important;
+        margin: 4px 0 !important;
+        color: white !important;
+        display: flex !important;
+        align-items: center !important;
+        cursor: pointer !important;
+        min-height: 44px !important;
+    }
 
-/* Alerts */
-.stAlert {
-    border-radius: 12px !important;
-    padding: 16px !important;
-    margin: 12px 0 !important;
-}
+    @media (max-width: 768px) {
+        [data-testid="column"] {
+            width: 100% !important;
+            margin-bottom: 16px !important;
+        }
+        
+        h1 { font-size: 28px !important; }
+        h2 { font-size: 24px !important; }
+        h3 { font-size: 20px !important; }
+        
+        .stDataFrame {
+            font-size: 14px !important;
+        }
+    }
 
-.stSuccess {
-    background-color: #1a3a1a !important;
-    border-color: #2E8B57 !important;
-    color: #90EE90 !important;
-}
+    .stProgress > div > div {
+        background-color: #2E8B57 !important;
+        height: 20px !important;
+        border-radius: 10px !important;
+    }
 
-.stError {
-    background-color: #3a1a1a !important;
-    border-color: #8B2E2E !important;
-    color: #FF6B6B !important;
-}
+    .dataframe {
+        background-color: #1a1a1a !important;
+        color: white !important;
+        border-radius: 12px !important;
+        overflow: hidden !important;
+    }
 
-.stInfo {
-    background-color: #1a2a3a !important;
-    border-color: #2E578B !important;
-    color: #87CEEB !important;
-}
+    .stAlert {
+        border-radius: 12px !important;
+        padding: 16px !important;
+        margin: 12px 0 !important;
+    }
 
-/* NVR shapes */
-.nvr-shape {
-    font-size: 32px !important;
-    text-align: center !important;
-    margin: 24px 0 !important;
-    line-height: 1.5 !important;
-    letter-spacing: 8px !important;
-}
+    .stSuccess {
+        background-color: #1a3a1a !important;
+        border-color: #2E8B57 !important;
+        color: #90EE90 !important;
+    }
 
-@media (max-width: 768px) {
+    .stError {
+        background-color: #3a1a1a !important;
+        border-color: #8B2E2E !important;
+        color: #FF6B6B !important;
+    }
+
+    .stInfo {
+        background-color: #1a2a3a !important;
+        border-color: #2E578B !important;
+        color: #87CEEB !important;
+    }
+
     .nvr-shape {
-        font-size: 24px !important;
-        letter-spacing: 4px !important;
+        font-size: 32px !important;
+        text-align: center !important;
+        margin: 24px 0 !important;
+        line-height: 1.5 !important;
+        letter-spacing: 8px !important;
     }
-}
 
-/* Metrics */
-[data-testid="metric-container"] {
-    background-color: #1a1a1a !important;
-    border: 2px solid #333 !important;
-    border-radius: 12px !important;
-    padding: 16px !important;
-}
-
-/* Sidebar optimization for mobile */
-@media (max-width: 768px) {
-    [data-testid="stSidebar"] {
-        min-width: 280px !important;
+    @media (max-width: 768px) {
+        .nvr-shape {
+            font-size: 24px !important;
+            letter-spacing: 4px !important;
+        }
     }
-}
 
-/* Input fields */
-.stNumberInput input, .stTextInput input, .stSelectbox select {
-    font-size: 18px !important;
-    padding: 12px !important;
-    min-height: 48px !important;
-    border-radius: 10px !important;
-}
+    [data-testid="metric-container"] {
+        background-color: #1a1a1a !important;
+        border: 2px solid #333 !important;
+        border-radius: 12px !important;
+        padding: 16px !important;
+    }
 
-/* Prevent horizontal scrolling */
-.main .block-container {
-    max-width: 100% !important;
-    overflow-x: hidden !important;
-}
-</style>
+    @media (max-width: 768px) {
+        [data-testid="stSidebar"] {
+            min-width: 280px !important;
+        }
+    }
+
+    .stNumberInput input, .stTextInput input, .stSelectbox select {
+        font-size: 18px !important;
+        padding: 12px !important;
+        min-height: 48px !important;
+        border-radius: 10px !important;
+    }
+
+    .main .block-container {
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+    }
+    </style>
 """, unsafe_allow_html=True)
 
-# App title
+# App title (separate markdown call)
 st.markdown("""
 <div style="text-align: center; padding: 20px 0;">
     <h1 style="color: #2E8B57; margin-bottom: 10px;">🧠 11+ Practice App</h1>
@@ -540,9 +519,23 @@ if page == "Data Info" and mode_type == "Parent Mode":
         st.dataframe(df.head(10), use_container_width=True)
 
         st.markdown("### Question Type Distribution")
-        type_counts = df["Type"].value_counts()
-        fig = px.pie(values=type_counts.values, names=type_counts.index, title="Question Types")
-        st.plotly_chart(fig, use_container_width=True)
+        type_counts = df["Type"].value_counts().reset_index()
+        type_counts.columns = ["Type", "Count"]
+        
+        # Using Altair bar chart
+        chart = alt.Chart(type_counts).mark_bar().encode(
+            x='Type:N',
+            y='Count:Q',
+            color='Type:N',
+            tooltip=['Type', 'Count']
+        ).properties(
+            title="Question Types Distribution",
+            height=400
+        )
+        st.altair_chart(chart, use_container_width=True)
+        
+        # Also show as a table
+        st.dataframe(type_counts, use_container_width=True)
     except Exception as e:
         st.error(f"Error loading CSV: {str(e)}")
 
@@ -775,17 +768,40 @@ elif page == "My Progress" and mode_type == "Kid Mode":
         with col3:
             st.metric("Days Until Exam", days_until_exam)
 
-        # Progress chart
+        # Progress chart using Altair
         st.subheader("📈 Progress Over Time")
         weekly_avg = df.groupby(pd.Grouper(key="date", freq="W"))["accuracy"].mean().reset_index()
         if not weekly_avg.empty:
-            fig = px.line(weekly_avg, x="date", y="accuracy", 
-                         title="Weekly Average Accuracy",
-                         labels={"accuracy": "Accuracy", "date": "Date"})
-            fig.add_hline(y=TARGET_ACCURACY, line_dash="dash", line_color="red",
-                         annotation_text=f"Target: {TARGET_ACCURACY:.0%}")
-            fig.update_yaxes(tickformat=".0%")
-            st.plotly_chart(fig, use_container_width=True)
+            # Create Altair line chart
+            line = alt.Chart(weekly_avg).mark_line(
+                point=True,
+                color='#2E8B57',
+                strokeWidth=3
+            ).encode(
+                x=alt.X('date:T', title='Date'),
+                y=alt.Y('accuracy:Q', title='Accuracy', axis=alt.Axis(format='%')),
+                tooltip=['date:T', alt.Tooltip('accuracy:Q', format='.1%')]
+            ).properties(
+                height=400,
+                title='Weekly Average Accuracy'
+            )
+            
+            # Add target line
+            target_rule = alt.Chart(pd.DataFrame({'y': [TARGET_ACCURACY]})).mark_rule(
+                color='red',
+                strokeDash=[5, 5]
+            ).encode(y='y:Q')
+            
+            target_text = alt.Chart(pd.DataFrame({'x': [weekly_avg['date'].min()], 'y': [TARGET_ACCURACY]})).mark_text(
+                text=f'Target: {TARGET_ACCURACY:.0%}',
+                align='left',
+                dx=5,
+                dy=-5,
+                color='red'
+            ).encode(x='x:T', y='y:Q')
+            
+            chart = (line + target_rule + target_text)
+            st.altair_chart(chart, use_container_width=True)
 
 # ---------- Dashboard ----------
 elif page == "Dashboard":
