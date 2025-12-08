@@ -88,6 +88,7 @@ def check_csv_file() -> bool:
     except Exception as e:
         return False
 
+
 def load_questions(question_type=None, limit=None) -> List[Dict[str, Any]]:
     if not CSV_FILE.exists():
         return []
@@ -659,11 +660,20 @@ elif page == "Quiz":
         with col3:
             finish_btn = st.button("🏁 Finish", use_container_width=True)
 
+        # --- PATCHED ANSWER MATCHING LOGIC BELOW ---
         if next_btn:
             if st.session_state.user_answers[idx] is not None:
-                correct = str(current.get("answer")).strip().lower()
-                selected = str(st.session_state.user_answers[idx]).strip().lower()
-                
+                # Robust answer matching for NVR questions
+                correct_raw = str(current.get("answer")).strip().lower()
+                selected_raw = str(st.session_state.user_answers[idx]).strip().lower()
+
+                if is_nvr_question:
+                    correct = enhance_nvr_display(correct_raw).strip().lower()
+                    selected = enhance_nvr_display(selected_raw).strip().lower()
+                else:
+                    correct = correct_raw
+                    selected = selected_raw
+
                 if timed_out:
                     st.error("Time's up - marked as incorrect")
                 elif selected == correct:
@@ -672,7 +682,7 @@ elif page == "Quiz":
                 else:
                     correct_display = enhance_nvr_display(current.get("answer")) if is_nvr_question else current.get("answer")
                     st.error(f"❌ Incorrect. The correct answer was: **{correct_display}**")
-                
+
                 time.sleep(1)
                 if idx < total - 1:
                     st.session_state.q_index += 1
@@ -682,7 +692,8 @@ elif page == "Quiz":
                     st.session_state.finished = True
             else:
                 st.warning("Please select an answer before proceeding")
-        
+        # --- END PATCHED BLOCK ---
+
         elif skip_btn:
             if idx < total - 1:
                 st.session_state.q_index += 1
@@ -850,3 +861,4 @@ st.markdown("""
     Made with ❤️ for Elisaveta | Streamlit Cloud | Mobile Optimized
 </div>
 """, unsafe_allow_html=True)
+
