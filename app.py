@@ -6,9 +6,10 @@ from typing import List, Dict, Any
 from datetime import timedelta
 from pathlib import Path
 import altair as alt
+import re
 
 # ---------- Configuration ----------
-BASE_DIR = Path(__file__).parent
+BASE_DIR = Path(__file__).parent.resolve()
 DATA_DIR = BASE_DIR / "data"
 CSV_FILE = DATA_DIR / "11_Plus_Exam_Prep.csv"
 LOG_FILE = BASE_DIR / "results.csv"
@@ -19,47 +20,129 @@ TARGET_ACCURACY = 0.85  # 85%
 
 # ---------- File checking helper ----------
 def setup_directories():
+    """Create necessary directories if they don't exist"""
     try:
+        # Create data directory if it doesn't exist
         if not DATA_DIR.exists():
-            DATA_DIR.mkdir(exist_ok=True)
+            DATA_DIR.mkdir(parents=True, exist_ok=True)
+            print(f"Created directory: {DATA_DIR}")
     except Exception as e:
-        st.warning(f"Note: {str(e)}")
+        print(f"Note: Could not create directory: {str(e)}")
+        print(f"Using current directory: {Path.cwd()}")
 
 setup_directories()
 
-# ---------- NVR Visual Enhancement Function ----------
+# ---------- Enhanced NVR Visual Enhancement Function ----------
 def enhance_nvr_display(text):
+    """
+    Convert text descriptions to Unicode symbols for NVR questions.
+    This function handles: circle -> ●, square -> ■, triangle -> ▲, etc.
+    """
+    # Comprehensive mapping of text descriptions to Unicode symbols
     shape_map = {
+        # Basic shapes
         'circle': '●',
         'square': '■',
         'triangle': '▲',
         'hexagon': '⬢',
         'pentagon': '⬟',
         'octagon': '⬡',
+        'rectangle': '▭',
+        'diamond': '◆',
+        'star': '★',
+        'heart': '♥',
+        
+        # Filled/empty variations
         'filled circle': '●',
         'empty circle': '○',
-        'filled square': '■', 
+        'hollow circle': '○',
+        'full circle': '●',
+        
+        'filled square': '■',
         'empty square': '□',
+        'hollow square': '□',
+        'full square': '■',
+        
         'filled triangle': '▲',
         'empty triangle': '△',
+        'hollow triangle': '△',
+        'full triangle': '▲',
+        
+        # Arrows and directions
         'up': '↑',
-        'down': '↓', 
+        'down': '↓',
         'left': '←',
         'right': '→',
+        'up arrow': '↑',
+        'down arrow': '↓',
+        'left arrow': '←',
+        'right arrow': '→',
+        'arrow up': '↑',
+        'arrow down': '↓',
+        'arrow left': '←',
+        'arrow right': '→',
+        
+        # Shading patterns
         'shaded': '▓',
         'unshaded': '▒',
+        'half shaded': '▒',
+        'striped': '▒',
+        'checkered': '▒',
+        'pattern': '▒',
+        
+        # Lines and dots
         'thick line': '━━',
         'thin line': '──',
+        'dotted line': '┄┄',
+        'dashed line': '╌╌',
         'dot': '•',
         'large dot': '●',
         'small dot': '•',
-        'star': '★',
-        'heart': '♥'
+        'medium dot': '•',
+        
+        # Size descriptions
+        'small': '⊙',
+        'medium': '◉',
+        'large': '●',
+        'extra large': '⦿',
+        
+        # Colors (for reference, though we use symbols)
+        'black': '⬛',
+        'white': '⬜',
+        'gray': '◼',
+        'grey': '◼',
+        
+        # Rotation terms
+        'rotated': '↻',
+        'mirror': '⇄',
+        'reflected': '⇄',
+        'flipped': '⇅',
+        
+        # Sequence indicators
+        'next': '→',
+        'previous': '←',
+        'first': '①',
+        'second': '②',
+        'third': '③',
+        'fourth': '④',
     }
     
     enhanced_text = str(text)
+    
+    # Replace text descriptions with symbols (case-insensitive, whole word matching)
     for word, symbol in shape_map.items():
-        enhanced_text = enhanced_text.replace(word, symbol)
+        # Use regex to match whole words only
+        pattern = r'\b' + re.escape(word) + r'\b'
+        enhanced_text = re.sub(pattern, symbol, enhanced_text, flags=re.IGNORECASE)
+    
+    # Additional processing for common patterns
+    # Convert sequences like "circle, square, triangle" to "●, ■, ▲"
+    enhanced_text = re.sub(r'circle', '●', enhanced_text, flags=re.IGNORECASE)
+    enhanced_text = re.sub(r'square', '■', enhanced_text, flags=re.IGNORECASE)
+    enhanced_text = re.sub(r'triangle', '▲', enhanced_text, flags=re.IGNORECASE)
+    enhanced_text = re.sub(r'hexagon', '⬢', enhanced_text, flags=re.IGNORECASE)
+    enhanced_text = re.sub(r'pentagon', '⬟', enhanced_text, flags=re.IGNORECASE)
+    enhanced_text = re.sub(r'octagon', '⬡', enhanced_text, flags=re.IGNORECASE)
     
     return enhanced_text
 
@@ -88,7 +171,6 @@ def check_csv_file() -> bool:
     except Exception as e:
         return False
 
-
 def load_questions(question_type=None, limit=None) -> List[Dict[str, Any]]:
     if not CSV_FILE.exists():
         return []
@@ -114,6 +196,7 @@ def load_questions(question_type=None, limit=None) -> List[Dict[str, Any]]:
                 "q": row["Question"],
                 "options": [row["Option1"], row["Option2"], row["Option3"], row["Option4"]],
                 "answer": row["Answer"],
+                "type": row["Type"]
             }
             questions.append(question)
 
@@ -314,7 +397,6 @@ st.set_page_config(
 )
 
 # ---------- Mobile-Optimized CSS ----------
-# FIXED: Proper CSS injection with unsafe_allow_html=True
 st.markdown("""
     <style>
     .stApp {
@@ -422,11 +504,33 @@ st.markdown("""
         line-height: 1.5 !important;
         letter-spacing: 8px !important;
     }
+    
+    .nvr-question {
+        font-size: 24px !important;
+        line-height: 1.6 !important;
+        margin: 20px 0 !important;
+        padding: 15px !important;
+        background: #1a1a1a !important;
+        border-radius: 12px !important;
+        border: 2px solid #333 !important;
+    }
+    
+    .nvr-option {
+        font-size: 22px !important;
+        margin: 10px 0 !important;
+        padding: 12px !important;
+    }
 
     @media (max-width: 768px) {
         .nvr-shape {
             font-size: 24px !important;
             letter-spacing: 4px !important;
+        }
+        .nvr-question {
+            font-size: 20px !important;
+        }
+        .nvr-option {
+            font-size: 18px !important;
         }
     }
 
@@ -467,7 +571,8 @@ st.markdown("""
 
 # Check if CSV file exists
 if not CSV_FILE.exists():
-    st.error("❌ CSV file not found. Please ensure '11_Plus_Exam_Prep.csv' is in the 'data' folder.")
+    st.error(f"❌ CSV file not found. Please ensure '11_Plus_Exam_Prep.csv' is in the 'data' folder.")
+    st.info(f"Looking for file at: {CSV_FILE}")
     st.info("Current directory structure should be:")
     st.code("""
     Elisa-smart-learning/
@@ -607,24 +712,39 @@ elif page == "Quiz":
         st.markdown(f"### **Question {idx + 1}**")
         
         current_question = current.get("q", "")
+        question_type = current.get("type", "")
+        
+        # Detect NVR questions more reliably
         is_nvr_question = (
-            "non-verbal" in str(current_question).lower() or 
+            "Non-Verbal-Reasoning" in str(question_type) or 
             mode == "NVR" or
-            any(shape in str(current_question).lower() for shape in [
+            any(term in str(current_question).lower() for term in [
                 'circle', 'square', 'triangle', 'arrow', 'shaded', 'unshaded', 
-                'filled', 'empty', 'rotation', 'mirror', 'reflect', 'shape'
+                'filled', 'empty', 'rotation', 'mirror', 'reflect', 'shape',
+                'hexagon', 'pentagon', 'octagon', 'pattern', 'sequence'
             ])
         )
         
         if is_nvr_question:
+            # Enhanced NVR display
             visual_question = enhance_nvr_display(current_question)
-            st.markdown(f"**{visual_question}**")
-            st.markdown('<div class="nvr-shape">🔺 🟦 ⬛ ⚫ 🔶</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="nvr-question">**{visual_question}**</div>', unsafe_allow_html=True)
+            
+            # Add decorative shapes for visual appeal
+            st.markdown('<div class="nvr-shape">● ■ ▲ ⬢ ⬟ ⬡ ★ ♥</div>', unsafe_allow_html=True)
+            
+            # Process options
             raw_options = [str(o) for o in current.get("options", [])]
             options = [enhance_nvr_display(opt) for opt in raw_options]
+            
+            # Store original answers for comparison
+            original_answer = str(current.get("answer", "")).strip()
+            enhanced_answer = enhance_nvr_display(original_answer)
         else:
+            # Regular question display
             st.markdown(f"**{current_question}**")
             options = [str(o) for o in current.get("options", [])]
+            enhanced_answer = str(current.get("answer", "")).strip()
 
         # Answer selection
         question_key = f"q{idx}"
@@ -635,7 +755,16 @@ elif page == "Quiz":
         else:
             shuffled = st.session_state.shuffled_options[question_key]
 
-        selected_answer = st.radio("Select your answer:", shuffled, key=f"choice_{idx}")
+        # Display options
+        if is_nvr_question:
+            selected_answer = st.radio(
+                "Select your answer:", 
+                shuffled, 
+                key=f"choice_{idx}"
+            )
+        else:
+            selected_answer = st.radio("Select your answer:", shuffled, key=f"choice_{idx}")
+        
         st.session_state.user_answers[idx] = selected_answer
 
         # Timer (if enabled)
@@ -660,29 +789,36 @@ elif page == "Quiz":
         with col3:
             finish_btn = st.button("🏁 Finish", use_container_width=True)
 
-        # --- PATCHED ANSWER MATCHING LOGIC BELOW ---
+        # Answer checking logic
         if next_btn:
             if st.session_state.user_answers[idx] is not None:
-                # Robust answer matching for NVR questions
-                correct_raw = str(current.get("answer")).strip().lower()
-                selected_raw = str(st.session_state.user_answers[idx]).strip().lower()
-
+                selected = str(st.session_state.user_answers[idx]).strip()
+                
+                # For NVR questions, compare enhanced versions
                 if is_nvr_question:
-                    correct = enhance_nvr_display(correct_raw).strip().lower()
-                    selected = enhance_nvr_display(selected_raw).strip().lower()
+                    # Enhanced comparison
+                    selected_enhanced = enhance_nvr_display(selected).strip()
+                    answer_enhanced = enhanced_answer.strip()
+                    
+                    if timed_out:
+                        st.error("Time's up - marked as incorrect")
+                    elif selected_enhanced == answer_enhanced:
+                        st.session_state.score += 1
+                        st.success("✅ Correct! Great job!")
+                    else:
+                        st.error(f"❌ Incorrect. The correct answer was: **{enhanced_answer}**")
                 else:
-                    correct = correct_raw
-                    selected = selected_raw
-
-                if timed_out:
-                    st.error("Time's up - marked as incorrect")
-                elif selected == correct:
-                    st.session_state.score += 1
-                    st.success("✅ Correct!")
-                else:
-                    correct_display = enhance_nvr_display(current.get("answer")) if is_nvr_question else current.get("answer")
-                    st.error(f"❌ Incorrect. The correct answer was: **{correct_display}**")
-
+                    # Regular comparison
+                    correct = str(current.get("answer")).strip()
+                    
+                    if timed_out:
+                        st.error("Time's up - marked as incorrect")
+                    elif selected == correct:
+                        st.session_state.score += 1
+                        st.success("✅ Correct!")
+                    else:
+                        st.error(f"❌ Incorrect. The correct answer was: **{correct}**")
+                
                 time.sleep(1)
                 if idx < total - 1:
                     st.session_state.q_index += 1
@@ -692,8 +828,7 @@ elif page == "Quiz":
                     st.session_state.finished = True
             else:
                 st.warning("Please select an answer before proceeding")
-        # --- END PATCHED BLOCK ---
-
+        
         elif skip_btn:
             if idx < total - 1:
                 st.session_state.q_index += 1
@@ -758,7 +893,6 @@ elif page == "Quiz":
             </div>
         </div>
         """, unsafe_allow_html=True)
-
 # ---------- My Progress (Kid Mode) ----------
 elif page == "My Progress" and mode_type == "Kid Mode":
     st.title("🌟 My Learning Journey")
@@ -861,4 +995,3 @@ st.markdown("""
     Made with ❤️ for Elisaveta | Streamlit Cloud | Mobile Optimized
 </div>
 """, unsafe_allow_html=True)
-
