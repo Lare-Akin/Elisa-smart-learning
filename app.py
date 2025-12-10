@@ -148,17 +148,49 @@ def enhance_nvr_display(text):
 
 # ---------- Logging ----------
 def write_log_header_if_needed():
-    if not LOG_FILE.exists():
-        with open(LOG_FILE, "w", newline="", encoding="utf-8") as f:
-            csv.writer(f).writerow(["date", "module", "topic", "score", "total", "seconds"])
+    """Create results file with header if it doesn't exist"""
+    try:
+        # Ensure the directory exists
+        LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
+        
+        if not LOG_FILE.exists():
+            with open(LOG_FILE, "w", newline="", encoding="utf-8") as f:
+                csv.writer(f).writerow(["date", "module", "topic", "score", "total", "seconds"])
+            print(f"✅ Created results file: {LOG_FILE}")
+    except Exception as e:
+        print(f"❌ Error creating results file: {str(e)}")
 
 def log_result(module, topic, score, total, seconds):
-    write_log_header_if_needed()
-    with open(LOG_FILE, "a", newline="", encoding="utf-8") as f:
-        csv.writer(f).writerow([
-            datetime.date.today().isoformat(),
-            module, topic, score, total, seconds
-        ])
+    """Log quiz results to CSV file"""
+    try:
+        # Debug info
+        print(f"📝 Attempting to log result to: {LOG_FILE}")
+        print(f"📁 Directory exists: {LOG_FILE.parent.exists()}")
+        
+        # Ensure the directory exists
+        LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
+        
+        write_log_header_if_needed()
+        
+        with open(LOG_FILE, "a", newline="", encoding="utf-8") as f:
+            csv.writer(f).writerow([
+                datetime.date.today().isoformat(),
+                module, topic, score, total, seconds
+            ])
+        print(f"✅ Result logged successfully: {module}, {topic}, {score}/{total}, {seconds}s")
+    except Exception as e:
+        print(f"❌ Error logging result: {str(e)}")
+        # Try an alternative location as backup
+        try:
+            alt_file = Path("quiz_results_backup.csv")
+            with open(alt_file, "a", newline="", encoding="utf-8") as f:
+                csv.writer(f).writerow([
+                    datetime.date.today().isoformat(),
+                    module, topic, score, total, seconds
+                ])
+            print(f"📋 Result saved to backup file: {alt_file}")
+        except Exception as alt_e:
+            print(f"❌ Also failed to write to backup: {str(alt_e)}")
 
 # ---------- Data helpers ----------
 def check_csv_file() -> bool:
@@ -594,7 +626,7 @@ mode_type = st.sidebar.radio("Choose Mode", ["Kid Mode", "Parent Mode"], horizon
 if mode_type == "Kid Mode":
     page = st.sidebar.radio("Choose view", ["Quiz", "My Progress"], horizontal=True)
 else:
-    page = st.sidebar.radio("Choose view", ["Quiz", "Dashboard", "Data Info", "Predictive Analytics"], horizontal=True)
+    page = st.sidebar.radio("Choose view", ["Quiz", "Dashboard", "Data Info", "Predictive Analytics", "Debug"], horizontal=True)
 
 # ---------- Refresh Button ----------
 with st.sidebar:
@@ -644,6 +676,58 @@ if page == "Data Info" and mode_type == "Parent Mode":
         st.dataframe(type_counts, use_container_width=True)
     except Exception as e:
         st.error(f"Error loading CSV: {str(e)}")
+
+# ---------- Debug Page ----------
+elif page == "Debug" and mode_type == "Parent Mode":
+    st.title("🔧 Debug Information")
+    
+    st.markdown("### File System Info")
+    st.write(f"Current directory: {Path.cwd()}")
+    st.write(f"BASE_DIR: {BASE_DIR}")
+    st.write(f"LOG_FILE path: {LOG_FILE}")
+    st.write(f"LOG_FILE exists: {LOG_FILE.exists()}")
+    
+    if LOG_FILE.exists():
+        st.markdown("### Current Results File Content")
+        try:
+            df = pd.read_csv(LOG_FILE)
+            st.dataframe(df)
+            st.write(f"Total records: {len(df)}")
+            st.write(f"File size: {LOG_FILE.stat().st_size} bytes")
+            st.write(f"Last modified: {datetime.datetime.fromtimestamp(LOG_FILE.stat().st_mtime)}")
+        except Exception as e:
+            st.error(f"Error reading results file: {e}")
+    else:
+        st.warning("Results file doesn't exist yet. Take a quiz first!")
+    
+    # Check if we can write to file
+    st.markdown("### Test Write Permission")
+    if st.button("Test Write to File"):
+        try:
+            LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
+            with open(LOG_FILE, "a", newline="", encoding="utf-8") as f:
+                writer = csv.writer(f)
+                writer.writerow([datetime.date.today().isoformat(), "test", "test", 1, 1, 10])
+            st.success("✅ Successfully wrote test data to file")
+            st.rerun()
+        except Exception as e:
+            st.error(f"❌ Failed to write: {e}")
+    
+    # Show session state info
+    st.markdown("### Session State")
+    session_keys = list(st.session_state.keys())
+    st.write(f"Session keys: {session_keys}")
+    
+    # Check for backup file
+    backup_file = Path("quiz_results_backup.csv")
+    if backup_file.exists():
+        st.markdown("### Backup File Content")
+        try:
+            backup_df = pd.read_csv(backup_file)
+            st.dataframe(backup_df)
+            st.write(f"Backup records: {len(backup_df)}")
+        except Exception as e:
+            st.error(f"Error reading backup file: {e}")
 
 # ---------- Quiz ----------
 elif page == "Quiz":
@@ -844,6 +928,7 @@ elif page == "Quiz":
         if st.session_state.finished and not st.session_state.get("quiz_completed", False):
             duration = int(time.time() - st.session_state.start_time)
             score = st.session_state.score
+            # Log the result
             log_result(st.session_state.get("module_label", "unknown"), mode, score, total, duration)
             st.session_state.quiz_completed = True
 
@@ -988,6 +1073,7 @@ elif page == "Predictive Analytics" and mode_type == "Parent Mode":
         with col3:
             st.metric("Total Questions", metrics.get("total_questions", 0))
 
+# ---------- Footer ----------
 # ---------- Footer ----------
 st.markdown("---")
 st.markdown("""
