@@ -38,9 +38,7 @@ def enhance_nvr_display(text):
     Convert text descriptions to Unicode symbols for NVR questions.
     This function handles: circle -> ●, square -> ■, triangle -> ▲, etc.
     """
-    # Comprehensive mapping of text descriptions to Unicode symbols
     shape_map = {
-        # Basic shapes
         'circle': '●',
         'square': '■',
         'triangle': '▲',
@@ -51,24 +49,18 @@ def enhance_nvr_display(text):
         'diamond': '◆',
         'star': '★',
         'heart': '♥',
-        
-        # Filled/empty variations
         'filled circle': '●',
         'empty circle': '○',
         'hollow circle': '○',
         'full circle': '●',
-        
         'filled square': '■',
         'empty square': '□',
         'hollow square': '□',
         'full square': '■',
-        
         'filled triangle': '▲',
         'empty triangle': '△',
         'hollow triangle': '△',
         'full triangle': '▲',
-        
-        # Arrows and directions
         'up': '↑',
         'down': '↓',
         'left': '←',
@@ -81,16 +73,12 @@ def enhance_nvr_display(text):
         'arrow down': '↓',
         'arrow left': '←',
         'arrow right': '→',
-        
-        # Shading patterns
         'shaded': '▓',
         'unshaded': '▒',
         'half shaded': '▒',
         'striped': '▒',
         'checkered': '▒',
         'pattern': '▒',
-        
-        # Lines and dots
         'thick line': '━━',
         'thin line': '──',
         'dotted line': '┄┄',
@@ -99,26 +87,18 @@ def enhance_nvr_display(text):
         'large dot': '●',
         'small dot': '•',
         'medium dot': '•',
-        
-        # Size descriptions
         'small': '⊙',
         'medium': '◉',
         'large': '●',
         'extra large': '⦿',
-        
-        # Colors (for reference, though we use symbols)
         'black': '⬛',
         'white': '⬜',
         'gray': '◼',
         'grey': '◼',
-        
-        # Rotation terms
         'rotated': '↻',
         'mirror': '⇄',
         'reflected': '⇄',
         'flipped': '⇅',
-        
-        # Sequence indicators
         'next': '→',
         'previous': '←',
         'first': '①',
@@ -128,15 +108,10 @@ def enhance_nvr_display(text):
     }
     
     enhanced_text = str(text)
-    
-    # Replace text descriptions with symbols (case-insensitive, whole word matching)
     for word, symbol in shape_map.items():
-        # Use regex to match whole words only
         pattern = r'\b' + re.escape(word) + r'\b'
         enhanced_text = re.sub(pattern, symbol, enhanced_text, flags=re.IGNORECASE)
-    
-    # Additional processing for common patterns
-    # Convert sequences like "circle, square, triangle" to "●, ■, ▲"
+
     enhanced_text = re.sub(r'circle', '●', enhanced_text, flags=re.IGNORECASE)
     enhanced_text = re.sub(r'square', '■', enhanced_text, flags=re.IGNORECASE)
     enhanced_text = re.sub(r'triangle', '▲', enhanced_text, flags=re.IGNORECASE)
@@ -150,9 +125,7 @@ def enhance_nvr_display(text):
 def write_log_header_if_needed():
     """Create results file with header if it doesn't exist"""
     try:
-        # Ensure the directory exists
         LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
-        
         if not LOG_FILE.exists():
             with open(LOG_FILE, "w", newline="", encoding="utf-8") as f:
                 csv.writer(f).writerow(["date", "module", "topic", "score", "total", "seconds"])
@@ -163,13 +136,10 @@ def write_log_header_if_needed():
 def log_result(module, topic, score, total, seconds):
     """Log quiz results to CSV file"""
     try:
-        # Debug info
         print(f"📝 Attempting to log result to: {LOG_FILE}")
         print(f"📁 Directory exists: {LOG_FILE.parent.exists()}")
         
-        # Ensure the directory exists
         LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
-        
         write_log_header_if_needed()
         
         with open(LOG_FILE, "a", newline="", encoding="utf-8") as f:
@@ -180,7 +150,6 @@ def log_result(module, topic, score, total, seconds):
         print(f"✅ Result logged successfully: {module}, {topic}, {score}/{total}, {seconds}s")
     except Exception as e:
         print(f"❌ Error logging result: {str(e)}")
-        # Try an alternative location as backup
         try:
             alt_file = Path("quiz_results_backup.csv")
             with open(alt_file, "a", newline="", encoding="utf-8") as f:
@@ -200,7 +169,7 @@ def check_csv_file() -> bool:
         df = pd.read_csv(CSV_FILE)
         required_columns = ["Type", "Question", "Option1", "Option2", "Option3", "Option4", "Answer"]
         return all(col in df.columns for col in required_columns)
-    except Exception as e:
+    except Exception:
         return False
 
 def load_questions(question_type=None, limit=None) -> List[Dict[str, Any]]:
@@ -235,7 +204,7 @@ def load_questions(question_type=None, limit=None) -> List[Dict[str, Any]]:
         if limit and len(questions) > limit:
             return random.sample(questions, limit)
         return questions
-    except Exception as e:
+    except Exception:
         return []
 
 # ---------- Results load and sanitation ----------
@@ -260,7 +229,7 @@ def sanitize_results_file(path: Path) -> None:
         raw["topic"] = raw["topic"].astype(str)
 
         raw.to_csv(path, index=False, encoding="utf-8")
-    except Exception as e:
+    except Exception:
         pass
 
 def load_results(log_path: Path) -> pd.DataFrame:
@@ -347,6 +316,8 @@ def calculate_learning_trajectory(df: pd.DataFrame):
 
         current_to_target_gap = TARGET_ACCURACY - current_accuracy
         required_daily_improvement = (current_to_target_gap / days_until_exam) if days_until_exam > 0 else 0
+
+        df_sorted["trend_accuracy"] = slope * df_sorted["days"] + intercept
 
         return {
             "slope": slope,
@@ -436,7 +407,6 @@ st.markdown("""
         color: #ffffff !important;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
-
     .stButton > button {
         background-color: #2E8B57 !important;
         color: white !important;
@@ -451,13 +421,11 @@ st.markdown("""
         width: 100% !important;
         transition: all 0.2s ease !important;
     }
-
     .stButton > button:hover {
         background-color: #3DA56C !important;
         transform: translateY(-2px) !important;
         box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important;
     }
-
     .stRadio > div {
         background: #1a1a1a !important;
         border-radius: 12px !important;
@@ -465,7 +433,6 @@ st.markdown("""
         margin: 12px 0 !important;
         border: 2px solid #333 !important;
     }
-
     .stRadio > div > label {
         font-size: 18px !important;
         padding: 14px 0 !important;
@@ -476,59 +443,49 @@ st.markdown("""
         cursor: pointer !important;
         min-height: 44px !important;
     }
-
     @media (max-width: 768px) {
         [data-testid="column"] {
             width: 100% !important;
             margin-bottom: 16px !important;
         }
-        
         h1 { font-size: 28px !important; }
         h2 { font-size: 24px !important; }
         h3 { font-size: 20px !important; }
-        
         .stDataFrame {
             font-size: 14px !important;
         }
     }
-
     .stProgress > div > div {
         background-color: #2E8B57 !important;
         height: 20px !important;
         border-radius: 10px !important;
     }
-
     .dataframe {
         background-color: #1a1a1a !important;
         color: white !important;
         border-radius: 12px !important;
         overflow: hidden !important;
     }
-
     .stAlert {
         border-radius: 12px !important;
         padding: 16px !important;
         margin: 12px 0 !important;
     }
-
     .stSuccess {
         background-color: #1a3a1a !important;
         border-color: #2E8B57 !important;
         color: #90EE90 !important;
     }
-
     .stError {
         background-color: #3a1a1a !important;
         border-color: #8B2E2E !important;
         color: #FF6B6B !important;
     }
-
     .stInfo {
         background-color: #1a2a3a !important;
         border-color: #2E578B !important;
         color: #87CEEB !important;
     }
-
     .nvr-shape {
         font-size: 32px !important;
         text-align: center !important;
@@ -536,7 +493,6 @@ st.markdown("""
         line-height: 1.5 !important;
         letter-spacing: 8px !important;
     }
-    
     .nvr-question {
         font-size: 24px !important;
         line-height: 1.6 !important;
@@ -546,13 +502,11 @@ st.markdown("""
         border-radius: 12px !important;
         border: 2px solid #333 !important;
     }
-    
     .nvr-option {
         font-size: 22px !important;
         margin: 10px 0 !important;
         padding: 12px !important;
     }
-
     @media (max-width: 768px) {
         .nvr-shape {
             font-size: 24px !important;
@@ -565,27 +519,23 @@ st.markdown("""
             font-size: 18px !important;
         }
     }
-
     [data-testid="metric-container"] {
         background-color: #1a1a1a !important;
         border: 2px solid #333 !important;
         border-radius: 12px !important;
         padding: 16px !important;
     }
-
     @media (max-width: 768px) {
         [data-testid="stSidebar"] {
             min-width: 280px !important;
         }
     }
-
     .stNumberInput input, .stTextInput input, .stSelectbox select {
         font-size: 18px !important;
         padding: 12px !important;
         min-height: 48px !important;
         border-radius: 10px !important;
     }
-
     .main .block-container {
         max-width: 100% !important;
         overflow-x: hidden !important;
@@ -593,7 +543,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# App title (separate markdown call)
 st.markdown("""
 <div style="text-align: center; padding: 20px 0;">
     <h1 style="color: #2E8B57; margin-bottom: 10px;">🧠 11+ Practice App</h1>
@@ -660,7 +609,6 @@ if page == "Data Info" and mode_type == "Parent Mode":
         type_counts = df["Type"].value_counts().reset_index()
         type_counts.columns = ["Type", "Count"]
         
-        # Using Altair bar chart
         chart = alt.Chart(type_counts).mark_bar().encode(
             x='Type:N',
             y='Count:Q',
@@ -671,8 +619,6 @@ if page == "Data Info" and mode_type == "Parent Mode":
             height=400
         )
         st.altair_chart(chart, use_container_width=True)
-        
-        # Also show as a table
         st.dataframe(type_counts, use_container_width=True)
     except Exception as e:
         st.error(f"Error loading CSV: {str(e)}")
@@ -700,7 +646,6 @@ elif page == "Debug" and mode_type == "Parent Mode":
     else:
         st.warning("Results file doesn't exist yet. Take a quiz first!")
     
-    # Check if we can write to file
     st.markdown("### Test Write Permission")
     if st.button("Test Write to File"):
         try:
@@ -713,12 +658,10 @@ elif page == "Debug" and mode_type == "Parent Mode":
         except Exception as e:
             st.error(f"❌ Failed to write: {e}")
     
-    # Show session state info
     st.markdown("### Session State")
     session_keys = list(st.session_state.keys())
     st.write(f"Session keys: {session_keys}")
     
-    # Check for backup file
     backup_file = Path("quiz_results_backup.csv")
     if backup_file.exists():
         st.markdown("### Backup File Content")
@@ -771,7 +714,6 @@ elif page == "Quiz":
         total = len(st.session_state.questions)
         elapsed = int(time.time() - st.session_state.start_time) if st.session_state.start_time else 0
 
-        # Progress display
         if mode_type == "Kid Mode":
             st.markdown("### 🌟 Your Adventure")
             st.progress(idx / total)
@@ -791,14 +733,11 @@ elif page == "Quiz":
                 st.metric("Time", f"{elapsed}s")
 
         current = st.session_state.questions[idx]
-        
-        # Question display
         st.markdown(f"### **Question {idx + 1}**")
         
         current_question = current.get("q", "")
         question_type = current.get("type", "")
         
-        # Detect NVR questions more reliably
         is_nvr_question = (
             "Non-Verbal-Reasoning" in str(question_type) or 
             mode == "NVR" or
@@ -810,27 +749,18 @@ elif page == "Quiz":
         )
         
         if is_nvr_question:
-            # Enhanced NVR display
             visual_question = enhance_nvr_display(current_question)
             st.markdown(f'<div class="nvr-question">**{visual_question}**</div>', unsafe_allow_html=True)
-            
-            # Add decorative shapes for visual appeal
             st.markdown('<div class="nvr-shape">● ■ ▲ ⬢ ⬟ ⬡ ★ ♥</div>', unsafe_allow_html=True)
-            
-            # Process options
             raw_options = [str(o) for o in current.get("options", [])]
             options = [enhance_nvr_display(opt) for opt in raw_options]
-            
-            # Store original answers for comparison
             original_answer = str(current.get("answer", "")).strip()
             enhanced_answer = enhance_nvr_display(original_answer)
         else:
-            # Regular question display
             st.markdown(f"**{current_question}**")
             options = [str(o) for o in current.get("options", [])]
             enhanced_answer = str(current.get("answer", "")).strip()
 
-        # Answer selection
         question_key = f"q{idx}"
         if question_key not in st.session_state.get("shuffled_options", {}):
             shuffled = options.copy()
@@ -839,7 +769,6 @@ elif page == "Quiz":
         else:
             shuffled = st.session_state.shuffled_options[question_key]
 
-        # Display options
         if is_nvr_question:
             selected_answer = st.radio(
                 "Select your answer:", 
@@ -851,7 +780,6 @@ elif page == "Quiz":
         
         st.session_state.user_answers[idx] = selected_answer
 
-        # Timer (if enabled)
         timed_out = False
         if per_question_seconds > 0:
             elapsed_q = int(time.time() - st.session_state.get("question_start", time.time()))
@@ -864,7 +792,6 @@ elif page == "Quiz":
                 st.progress(remaining / per_question_seconds)
                 st.info(f"⏳ Time remaining: {remaining} seconds")
 
-        # Navigation buttons
         col1, col2, col3 = st.columns(3)
         with col1:
             next_btn = st.button("➡️ Next", use_container_width=True)
@@ -873,14 +800,11 @@ elif page == "Quiz":
         with col3:
             finish_btn = st.button("🏁 Finish", use_container_width=True)
 
-        # Answer checking logic
         if next_btn:
             if st.session_state.user_answers[idx] is not None:
                 selected = str(st.session_state.user_answers[idx]).strip()
                 
-                # For NVR questions, compare enhanced versions
                 if is_nvr_question:
-                    # Enhanced comparison
                     selected_enhanced = enhance_nvr_display(selected).strip()
                     answer_enhanced = enhanced_answer.strip()
                     
@@ -892,7 +816,6 @@ elif page == "Quiz":
                     else:
                         st.error(f"❌ Incorrect. The correct answer was: **{enhanced_answer}**")
                 else:
-                    # Regular comparison
                     correct = str(current.get("answer")).strip()
                     
                     if timed_out:
@@ -924,11 +847,9 @@ elif page == "Quiz":
         elif finish_btn:
             st.session_state.finished = True
 
-        # Completion
         if st.session_state.finished and not st.session_state.get("quiz_completed", False):
             duration = int(time.time() - st.session_state.start_time)
             score = st.session_state.score
-            # Log the result
             log_result(st.session_state.get("module_label", "unknown"), mode, score, total, duration)
             st.session_state.quiz_completed = True
 
@@ -963,7 +884,6 @@ elif page == "Quiz":
                 reset_session()
                 st.rerun()
     else:
-        # Welcome screen
         st.markdown("""
         <div style="background: linear-gradient(135deg, #2E8B57, #3DA56C); padding: 40px; border-radius: 20px; text-align: center; margin: 20px 0;">
             <h2 style="color: white; margin-bottom: 20px;">
@@ -978,6 +898,7 @@ elif page == "Quiz":
             </div>
         </div>
         """, unsafe_allow_html=True)
+
 # ---------- My Progress (Kid Mode) ----------
 elif page == "My Progress" and mode_type == "Kid Mode":
     st.title("🌟 My Learning Journey")
@@ -989,7 +910,6 @@ elif page == "My Progress" and mode_type == "Kid Mode":
         days_until_exam = (TARGET_EXAM_DATE - datetime.date.today()).days
         accuracy = df["accuracy"].mean()
 
-        # Metrics
         col1, col2, col3 = st.columns(3)
         with col1:
             st.metric("Total Quizzes", len(df))
@@ -998,11 +918,9 @@ elif page == "My Progress" and mode_type == "Kid Mode":
         with col3:
             st.metric("Days Until Exam", days_until_exam)
 
-        # Progress chart using Altair
         st.subheader("📈 Progress Over Time")
         weekly_avg = df.groupby(pd.Grouper(key="date", freq="W"))["accuracy"].mean().reset_index()
         if not weekly_avg.empty:
-            # Create Altair line chart
             line = alt.Chart(weekly_avg).mark_line(
                 point=True,
                 color='#2E8B57',
@@ -1016,7 +934,6 @@ elif page == "My Progress" and mode_type == "Kid Mode":
                 title='Weekly Average Accuracy'
             )
             
-            # Add target line
             target_rule = alt.Chart(pd.DataFrame({'y': [TARGET_ACCURACY]})).mark_rule(
                 color='red',
                 strokeDash=[5, 5]
@@ -1056,15 +973,15 @@ elif page == "Dashboard":
 
 # ---------- Predictive Analytics ----------
 elif page == "Predictive Analytics" and mode_type == "Parent Mode":
-    st.title("🔮 Predictive Analytics")
+    st.title("🔮 Predictive Analytics: 11+ Exam Readiness")
     df = load_results(LOG_FILE)
     
     if df.empty:
         st.info("Complete some quizzes to see analytics.")
     else:
         metrics = calculate_performance_metrics(df)
-        
-        st.subheader("📊 Performance Metrics")
+        trajectory = calculate_learning_trajectory(df)
+
         col1, col2, col3 = st.columns(3)
         with col1:
             st.metric("Overall Accuracy", f"{metrics.get('overall_accuracy', 0):.1%}")
@@ -1073,7 +990,155 @@ elif page == "Predictive Analytics" and mode_type == "Parent Mode":
         with col3:
             st.metric("Total Questions", metrics.get("total_questions", 0))
 
-# ---------- Footer ----------
+        st.markdown("---")
+
+        if trajectory is None:
+            st.info("Not enough data for trend modelling. Try at least 3 quiz sessions.")
+        else:
+            st.subheader("📈 Accuracy Trend and Forecast")
+            trend_df = trajectory["trend_data"]
+            slope = trajectory["slope"]
+            intercept = trajectory["intercept"]
+            days_until_exam = trajectory["days_until_exam"]
+
+            # Build forecast
+            last_day = trend_df["days"].max()
+            future_days = max(days_until_exam, 0)
+            forecast_days = np.arange(last_day, last_day + future_days + 1)
+
+            forecast_df = pd.DataFrame({
+                "days": forecast_days,
+                "accuracy": slope * forecast_days + intercept,
+                "segment": "Forecast"
+            })
+            forecast_df["accuracy"] = forecast_df["accuracy"].clip(0, 1)
+
+            hist_df = trend_df[["days", "accuracy"]].copy()
+            hist_df["segment"] = "History"
+
+            combined = pd.concat([hist_df, forecast_df], ignore_index=True)
+
+            chart = alt.Chart(combined).mark_line(point=True).encode(
+                x=alt.X("days:Q", title="Days Since First Quiz"),
+                y=alt.Y("accuracy:Q", title="Accuracy", scale=alt.Scale(domain=[0, 1])),
+                color=alt.Color("segment:N", title=""),
+                tooltip=["days", alt.Tooltip("accuracy:Q", format=".1%"), "segment"]
+            ).properties(
+                height=400,
+                title="Accuracy Trend and Forecast to Exam Day"
+            )
+
+            target_line = alt.Chart(pd.DataFrame({"y": [TARGET_ACCURACY]})).mark_rule(
+                color="red",
+                strokeDash=[5, 5]
+            ).encode(y="y:Q")
+
+            st.altair_chart(chart + target_line, use_container_width=True)
+
+            current_acc = trajectory["current_accuracy"]
+            predicted_acc = trajectory["predicted_accuracy"]
+
+            # Simple logistic mapping from predicted accuracy to "probability of passing"
+            # Centered around 75% with steepness 12
+            prob_pass = 1 / (1 + np.exp(-12 * (predicted_acc - 0.75)))
+
+            st.subheader("📌 Prediction Summary")
+            c1, c2, c3, c4 = st.columns(4)
+            with c1:
+                st.metric("Current Accuracy", f"{current_acc*100:.1f}%")
+            with c2:
+                st.metric("Predicted Exam Accuracy", f"{predicted_acc*100:.1f}%")
+            with c3:
+                st.metric("Days Until Exam", days_until_exam)
+            with c4:
+                st.metric("Probability of Passing", f"{prob_pass*100:.1f}%")
+
+            # Daily improvement needed
+            gap_to_target = TARGET_ACCURACY - current_acc
+            req_daily = trajectory["required_daily_improvement"]
+            if days_until_exam > 0:
+                if predicted_acc >= TARGET_ACCURACY:
+                    st.success("🎉 Based on current trend, Elisa is on track to meet or exceed the target by exam day.")
+                else:
+                    st.warning(
+                        f"At the current pace, Elisa is predicted to reach about {predicted_acc*100:.1f}% accuracy.\n"
+                        f"She needs roughly {req_daily*100:.2f}% extra improvement per day to hit the {TARGET_ACCURACY*100:.0f}% target."
+                    )
+            else:
+                st.info("Exam date has passed or is today — predictions beyond this point are less meaningful.")
+
+            st.markdown("---")
+
+            # Topic-level mastery visualisation
+            st.subheader("🧠 Topic Mastery (by Quiz Topic)")
+            mastery = summarize_mastery(df)
+            if not mastery.empty:
+                mastery_chart = alt.Chart(mastery).mark_bar().encode(
+                    x=alt.X("topic:N", title="Topic"),
+                    y=alt.Y("accuracy:Q", title="Average Accuracy", scale=alt.Scale(domain=[0, 1])),
+                    color=alt.Color("mastery:N", title="Mastery Level"),
+                    tooltip=["topic", alt.Tooltip("accuracy:Q", format=".1%"), "mastery"]
+                ).properties(
+                    height=350,
+                    title="Average Accuracy by Topic"
+                )
+                st.altair_chart(mastery_chart, use_container_width=True)
+                st.dataframe(
+                    mastery[["topic", "accuracy", "seconds", "mastery"]].sort_values("accuracy"),
+                    use_container_width=True
+                )
+            else:
+                st.info("Not enough topic-level data to compute mastery.")
+
+            st.markdown("---")
+
+            # Natural language summary for parents
+            st.subheader("📝 Parent Insight Summary")
+            overall = metrics.get("overall_accuracy", 0)
+            recent = metrics.get("recent_accuracy", 0)
+            improvement_7d = metrics.get("improvement_7d", 0)
+            consistency = metrics.get("consistency", 0)
+
+            summary_lines = []
+
+            summary_lines.append(
+                f"- Elisa's **overall accuracy** so far is **{overall*100:.1f}%**, "
+                f"with **{metrics.get('total_quizzes', 0)}** quizzes completed."
+            )
+            summary_lines.append(
+                f"- In the **last 7 days**, her average accuracy is **{recent*100:.1f}%**."
+            )
+            if improvement_7d > 0:
+                summary_lines.append(
+                    f"- Compared to earlier weeks, she has improved by roughly **{improvement_7d*100:.1f}%** over the last week."
+                )
+            elif improvement_7d < 0:
+                summary_lines.append(
+                    f"- There is a slight dip of about **{abs(improvement_7d)*100:.1f}%** compared to earlier weeks — "
+                    "a great opportunity to revisit a few trickier topics."
+                )
+            else:
+                summary_lines.append(
+                    "- Her performance has been **stable** over the last week."
+                )
+
+            summary_lines.append(
+                f"- Her performance **consistency** (how variable scores are) is around **{consistency*100:.1f}%** "
+                "(higher is more consistent)."
+            )
+
+            if predicted_acc >= TARGET_ACCURACY:
+                summary_lines.append(
+                    f"- If she continues at this pace, she is **on track** to meet or exceed the **{TARGET_ACCURACY*100:.0f}%** target by September."
+                )
+            else:
+                summary_lines.append(
+                    f"- At the current pace, she may reach around **{predicted_acc*100:.1f}%** by the exam. "
+                    "A few extra focused sessions on weaker topics could significantly boost this."
+                )
+
+            st.markdown("\n".join(summary_lines))
+
 # ---------- Footer ----------
 st.markdown("---")
 st.markdown("""
