@@ -7,12 +7,17 @@ from datetime import timedelta
 from pathlib import Path
 import altair as alt
 import re
+import sqlite3
 
 # ---------- Configuration ----------
-BASE_DIR = Path(__file__).parent.resolve()
+try:
+    BASE_DIR = Path(__file__).parent.resolve()
+except:
+    BASE_DIR = Path.cwd()
+
 DATA_DIR = BASE_DIR / "data"
 CSV_FILE = DATA_DIR / "11_Plus_Exam_Prep.csv"
-LOG_FILE = BASE_DIR / "results.csv"
+DB_FILE = BASE_DIR / "results.db"
 
 QUESTION_LIMIT = 25
 TARGET_EXAM_DATE = datetime.date(2026, 9, 15)
@@ -31,6 +36,75 @@ def setup_directories():
         print(f"Using current directory: {Path.cwd()}")
 
 setup_directories()
+
+# ---------- Database Functions ----------
+def init_database():
+    """Initialize SQLite database"""
+    try:
+        conn = sqlite3.connect(DB_FILE, check_same_thread=False)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS quiz_results (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                date TEXT NOT NULL,
+                module TEXT NOT NULL,
+                topic TEXT NOT NULL,
+                score INTEGER NOT NULL,
+                total INTEGER NOT NULL,
+                seconds INTEGER NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        conn.commit()
+        print(f"✅ Database initialized at: {DB_FILE}")
+        return conn
+    except Exception as e:
+        print(f"❌ Error initializing database: {e}")
+        return None
+
+# Initialize database connection
+if 'db_conn' not in st.session_state:
+    st.session_state.db_conn = init_database()
+
+def log_result(module, topic, score, total, seconds):
+    """Log quiz results to SQLite database"""
+    try:
+        if 'db_conn' not in st.session_state or not st.session_state.db_conn:
+            st.session_state.db_conn = init_database()
+        
+        conn = st.session_state.db_conn
+        conn.execute("""
+            INSERT INTO quiz_results (date, module, topic, score, total, seconds)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (
+            datetime.date.today().isoformat(),
+            module, topic, score, total, seconds
+        ))
+        conn.commit()
+        print(f"✅ Result logged to database: {module}, {topic}, {score}/{total}, {seconds}s")
+    except Exception as e:
+        print(f"❌ Error logging to database: {e}")
+
+def load_results() -> pd.DataFrame:
+    """Load results from SQLite database"""
+    try:
+        if 'db_conn' not in st.session_state or not st.session_state.db_conn:
+            return pd.DataFrame(columns=["date", "module", "topic", "score", "total", "seconds", "accuracy"])
+        
+        df = pd.read_sql_query("""
+            SELECT date, module, topic, score, total, seconds 
+            FROM quiz_results 
+            ORDER BY date DESC
+        """, st.session_state.db_conn)
+        
+        if not df.empty:
+            df["date"] = pd.to_datetime(df["date"], errors="coerce")
+            df["accuracy"] = (df["score"] / df["total"]).clip(lower=0, upper=1)
+            print(f"✅ Loaded {len(df)} records from database")
+            return df
+    except Exception as e:
+        print(f"❌ Error loading from database: {e}")
+    
+    return pd.DataFrame(columns=["date", "module", "topic", "score", "total", "seconds", "accuracy"])
 
 # ---------- Enhanced NVR Visual Enhancement Function ----------
 def enhance_nvr_display(text):
@@ -121,46 +195,6 @@ def enhance_nvr_display(text):
     
     return enhanced_text
 
-# ---------- Logging ----------
-def write_log_header_if_needed():
-    """Create results file with header if it doesn't exist"""
-    try:
-        LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
-        if not LOG_FILE.exists():
-            with open(LOG_FILE, "w", newline="", encoding="utf-8") as f:
-                csv.writer(f).writerow(["date", "module", "topic", "score", "total", "seconds"])
-            print(f"✅ Created results file: {LOG_FILE}")
-    except Exception as e:
-        print(f"❌ Error creating results file: {str(e)}")
-
-def log_result(module, topic, score, total, seconds):
-    """Log quiz results to CSV file"""
-    try:
-        print(f"📝 Attempting to log result to: {LOG_FILE}")
-        print(f"📁 Directory exists: {LOG_FILE.parent.exists()}")
-        
-        LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
-        write_log_header_if_needed()
-        
-        with open(LOG_FILE, "a", newline="", encoding="utf-8") as f:
-            csv.writer(f).writerow([
-                datetime.date.today().isoformat(),
-                module, topic, score, total, seconds
-            ])
-        print(f"✅ Result logged successfully: {module}, {topic}, {score}/{total}, {seconds}s")
-    except Exception as e:
-        print(f"❌ Error logging result: {str(e)}")
-        try:
-            alt_file = Path("quiz_results_backup.csv")
-            with open(alt_file, "a", newline="", encoding="utf-8") as f:
-                csv.writer(f).writerow([
-                    datetime.date.today().isoformat(),
-                    module, topic, score, total, seconds
-                ])
-            print(f"📋 Result saved to backup file: {alt_file}")
-        except Exception as alt_e:
-            print(f"❌ Also failed to write to backup: {str(alt_e)}")
-
 # ---------- Data helpers ----------
 def check_csv_file() -> bool:
     if not CSV_FILE.exists():
@@ -206,52 +240,6 @@ def load_questions(question_type=None, limit=None) -> List[Dict[str, Any]]:
         return questions
     except Exception:
         return []
-
-# ---------- Results load and sanitation ----------
-def sanitize_results_file(path: Path) -> None:
-    if not path.exists():
-        return
-    try:
-        raw = pd.read_csv(path, header=0)
-        expected_cols = ["date", "module", "topic", "score", "total", "seconds"]
-        if raw.shape[1] > 6:
-            raw = raw.iloc[:, :6]
-        if raw.shape[1] == 6:
-            raw.columns = expected_cols
-
-        raw = raw.dropna(how="all")
-        raw["date"] = pd.to_datetime(raw["date"], errors="coerce")
-        for c in ["score", "total", "seconds"]:
-            raw[c] = pd.to_numeric(raw[c], errors="coerce")
-
-        raw = raw.dropna(subset=["date", "module", "topic", "score", "total", "seconds"])
-        raw["module"] = raw["module"].astype(str)
-        raw["topic"] = raw["topic"].astype(str)
-
-        raw.to_csv(path, index=False, encoding="utf-8")
-    except Exception:
-        pass
-
-def load_results(log_path: Path) -> pd.DataFrame:
-    if not log_path.exists():
-        return pd.DataFrame(columns=["date", "module", "topic", "score", "total", "seconds", "accuracy"])
-
-    sanitize_results_file(log_path)
-    try:
-        df = pd.read_csv(log_path)
-        base_cols = ["date", "module", "topic", "score", "total", "seconds"]
-        df = df[base_cols]
-
-        df["date"] = pd.to_datetime(df["date"], errors="coerce")
-        df["score"] = pd.to_numeric(df["score"], errors="coerce")
-        df["total"] = pd.to_numeric(df["total"], errors="coerce")
-        df["seconds"] = pd.to_numeric(df["seconds"], errors="coerce")
-
-        df = df.dropna(subset=["date", "module", "topic", "score", "total", "seconds"])
-        df["accuracy"] = (df["score"] / df["total"]).clip(lower=0, upper=1)
-        return df
-    except:
-        return pd.DataFrame()
 
 def summarize_mastery(df: pd.DataFrame) -> pd.DataFrame:
     if df.empty:
@@ -385,7 +373,8 @@ def reset_session():
 
 def clear_all_session():
     for key in list(st.session_state.keys()):
-        del st.session_state[key]
+        if key != 'db_conn':  # Don't clear database connection
+            del st.session_state[key]
 
 # ---------- Main App ----------
 st.set_page_config(
@@ -395,7 +384,7 @@ st.set_page_config(
     menu_items={
         'Get Help': 'https://streamlit.io',
         'Report a bug': None,
-        'About': "Elisa's 11+ Learning App - Mobile Optimized"
+        'About': "Elisa's 11+ Learning App - Mobile Optimized with SQLite Database"
     }
 )
 
@@ -546,7 +535,7 @@ st.markdown("""
 st.markdown("""
 <div style="text-align: center; padding: 20px 0;">
     <h1 style="color: #2E8B57; margin-bottom: 10px;">🧠 11+ Practice App</h1>
-    <p style="color: #ccc; font-size: 18px;">Mobile-friendly learning for Elisaveta</p>
+    <p style="color: #ccc; font-size: 18px;">Mobile-friendly learning for Elisaveta • SQLite Database</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -569,6 +558,8 @@ else:
         st.error("❌ CSV file format is incorrect. Please check the required columns.")
     else:
         st.success("✅ App initialized successfully!")
+        if st.session_state.db_conn:
+            st.info(f"✅ Database connected: {DB_FILE}")
 
 # ---------- Mode Selector ----------
 mode_type = st.sidebar.radio("Choose Mode", ["Kid Mode", "Parent Mode"], horizontal=True)
@@ -627,50 +618,42 @@ if page == "Data Info" and mode_type == "Parent Mode":
 elif page == "Debug" and mode_type == "Parent Mode":
     st.title("🔧 Debug Information")
     
+    st.markdown("### Database Status")
+    if 'db_conn' in st.session_state and st.session_state.db_conn:
+        st.success("✅ Database connected")
+        
+        # Show table info
+        cursor = st.session_state.db_conn.cursor()
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+        tables = cursor.fetchall()
+        st.write("Tables in database:", tables)
+        
+        # Count records
+        cursor.execute("SELECT COUNT(*) FROM quiz_results")
+        count = cursor.fetchone()[0]
+        st.write(f"Total quiz records: {count}")
+        
+        # Show recent records
+        cursor.execute("SELECT * FROM quiz_results ORDER BY created_at DESC LIMIT 10")
+        recent = cursor.fetchall()
+        if recent:
+            st.write("Recent records:", recent)
+    else:
+        st.error("❌ Database not connected")
+    
     st.markdown("### File System Info")
     st.write(f"Current directory: {Path.cwd()}")
     st.write(f"BASE_DIR: {BASE_DIR}")
-    st.write(f"LOG_FILE path: {LOG_FILE}")
-    st.write(f"LOG_FILE exists: {LOG_FILE.exists()}")
+    st.write(f"DB_FILE path: {DB_FILE}")
+    st.write(f"DB_FILE exists: {DB_FILE.exists()}")
     
-    if LOG_FILE.exists():
-        st.markdown("### Current Results File Content")
-        try:
-            df = pd.read_csv(LOG_FILE)
-            st.dataframe(df)
-            st.write(f"Total records: {len(df)}")
-            st.write(f"File size: {LOG_FILE.stat().st_size} bytes")
-            st.write(f"Last modified: {datetime.datetime.fromtimestamp(LOG_FILE.stat().st_mtime)}")
-        except Exception as e:
-            st.error(f"Error reading results file: {e}")
-    else:
-        st.warning("Results file doesn't exist yet. Take a quiz first!")
-    
-    st.markdown("### Test Write Permission")
-    if st.button("Test Write to File"):
-        try:
-            LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
-            with open(LOG_FILE, "a", newline="", encoding="utf-8") as f:
-                writer = csv.writer(f)
-                writer.writerow([datetime.date.today().isoformat(), "test", "test", 1, 1, 10])
-            st.success("✅ Successfully wrote test data to file")
-            st.rerun()
-        except Exception as e:
-            st.error(f"❌ Failed to write: {e}")
+    if DB_FILE.exists():
+        st.write(f"File size: {DB_FILE.stat().st_size} bytes")
+        st.write(f"Last modified: {datetime.datetime.fromtimestamp(DB_FILE.stat().st_mtime)}")
     
     st.markdown("### Session State")
     session_keys = list(st.session_state.keys())
     st.write(f"Session keys: {session_keys}")
-    
-    backup_file = Path("quiz_results_backup.csv")
-    if backup_file.exists():
-        st.markdown("### Backup File Content")
-        try:
-            backup_df = pd.read_csv(backup_file)
-            st.dataframe(backup_df)
-            st.write(f"Backup records: {len(backup_df)}")
-        except Exception as e:
-            st.error(f"Error reading backup file: {e}")
 
 # ---------- Quiz ----------
 elif page == "Quiz":
@@ -902,7 +885,7 @@ elif page == "Quiz":
 # ---------- My Progress (Kid Mode) ----------
 elif page == "My Progress" and mode_type == "Kid Mode":
     st.title("🌟 My Learning Journey")
-    df = load_results(LOG_FILE)
+    df = load_results()
     
     if df.empty:
         st.info("📝 No quiz data yet. Complete a quiz to see your progress!")
@@ -953,7 +936,7 @@ elif page == "My Progress" and mode_type == "Kid Mode":
 # ---------- Dashboard ----------
 elif page == "Dashboard":
     st.title("📊 Topic Mastery Dashboard")
-    df = load_results(LOG_FILE)
+    df = load_results()
     
     if df.empty:
         st.info("No quiz data available yet.")
@@ -970,11 +953,22 @@ elif page == "Dashboard":
                 summary.style.format({"accuracy": "{:.1%}", "seconds": "{:.1f}"}),
                 use_container_width=True
             )
+            
+            # Add download button for data
+            st.markdown("---")
+            st.markdown("### 💾 Export Data")
+            csv = df.to_csv(index=False)
+            st.download_button(
+                label="📥 Download All Results as CSV",
+                data=csv,
+                file_name=f"elisa_quiz_results_{datetime.date.today()}.csv",
+                mime="text/csv",
+            )
 
 # ---------- Predictive Analytics ----------
 elif page == "Predictive Analytics" and mode_type == "Parent Mode":
     st.title("🔮 Predictive Analytics: 11+ Exam Readiness")
-    df = load_results(LOG_FILE)
+    df = load_results()
     
     if df.empty:
         st.info("Complete some quizzes to see analytics.")
@@ -1039,7 +1033,6 @@ elif page == "Predictive Analytics" and mode_type == "Parent Mode":
             predicted_acc = trajectory["predicted_accuracy"]
 
             # Simple logistic mapping from predicted accuracy to "probability of passing"
-            # Centered around 75% with steepness 12
             prob_pass = 1 / (1 + np.exp(-12 * (predicted_acc - 0.75)))
 
             st.subheader("📌 Prediction Summary")
@@ -1143,6 +1136,6 @@ elif page == "Predictive Analytics" and mode_type == "Parent Mode":
 st.markdown("---")
 st.markdown("""
 <div style="text-align: center; color: #888; font-size: 14px; padding: 20px 0;">
-    Made with ❤️ for Elisaveta | Streamlit Cloud | Mobile Optimized
+    Made with ❤️ for Elisaveta | Streamlit Cloud | SQLite Database | Mobile Optimized
 </div>
 """, unsafe_allow_html=True)
