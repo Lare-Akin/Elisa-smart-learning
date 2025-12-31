@@ -7,7 +7,7 @@ from datetime import timedelta
 from pathlib import Path
 import altair as alt
 import re
-import sqlite3
+import json
 
 # ---------- Configuration ----------
 try:
@@ -17,7 +17,7 @@ except:
 
 DATA_DIR = BASE_DIR / "data"
 CSV_FILE = DATA_DIR / "11_Plus_Exam_Prep.csv"
-DB_FILE = BASE_DIR / "results.db"
+JSON_FILE = DATA_DIR / "quiz_results.json"
 
 QUESTION_LIMIT = 25
 TARGET_EXAM_DATE = datetime.date(2026, 9, 15)
@@ -31,80 +31,85 @@ def setup_directories():
         if not DATA_DIR.exists():
             DATA_DIR.mkdir(parents=True, exist_ok=True)
             print(f"Created directory: {DATA_DIR}")
+        
+        # Create JSON file if it doesn't exist
+        if not JSON_FILE.exists():
+            with open(JSON_FILE, 'w') as f:
+                json.dump([], f)
+            print(f"Created JSON file: {JSON_FILE}")
+            
     except Exception as e:
         print(f"Note: Could not create directory: {str(e)}")
         print(f"Using current directory: {Path.cwd()}")
 
 setup_directories()
 
-# ---------- Database Functions ----------
-def init_database():
-    """Initialize SQLite database"""
-    try:
-        conn = sqlite3.connect(DB_FILE, check_same_thread=False)
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS quiz_results (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                date TEXT NOT NULL,
-                module TEXT NOT NULL,
-                topic TEXT NOT NULL,
-                score INTEGER NOT NULL,
-                total INTEGER NOT NULL,
-                seconds INTEGER NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        """)
-        conn.commit()
-        print(f"✅ Database initialized at: {DB_FILE}")
-        return conn
-    except Exception as e:
-        print(f"❌ Error initializing database: {e}")
-        return None
-
-# Initialize database connection
-if 'db_conn' not in st.session_state:
-    st.session_state.db_conn = init_database()
-
+# ---------- JSON Functions ----------
 def log_result(module, topic, score, total, seconds):
-    """Log quiz results to SQLite database"""
+    """Log quiz results to JSON file"""
     try:
-        if 'db_conn' not in st.session_state or not st.session_state.db_conn:
-            st.session_state.db_conn = init_database()
+        # Load existing results
+        if JSON_FILE.exists():
+            with open(JSON_FILE, 'r') as f:
+                results = json.load(f)
+        else:
+            results = []
         
-        conn = st.session_state.db_conn
-        conn.execute("""
-            INSERT INTO quiz_results (date, module, topic, score, total, seconds)
-            VALUES (?, ?, ?, ?, ?, ?)
-        """, (
-            datetime.date.today().isoformat(),
-            module, topic, score, total, seconds
-        ))
-        conn.commit()
-        print(f"✅ Result logged to database: {module}, {topic}, {score}/{total}, {seconds}s")
+        # Create new result entry
+        new_result = {
+            "date": datetime.date.today().isoformat(),
+            "module": module,
+            "topic": topic,
+            "score": score,
+            "total": total,
+            "seconds": seconds,
+            "created_at": datetime.datetime.now().isoformat()
+        }
+        
+        # Append and save
+        results.append(new_result)
+        with open(JSON_FILE, 'w') as f:
+            json.dump(results, f, indent=2)
+            
+        print(f"✅ Result logged to JSON: {module}, {topic}, {score}/{total}, {seconds}s")
+        return True
+        
     except Exception as e:
-        print(f"❌ Error logging to database: {e}")
+        print(f"❌ Error logging to JSON: {e}")
+        return False
 
 def load_results() -> pd.DataFrame:
-    """Load results from SQLite database"""
+    """Load results from JSON file"""
     try:
-        if 'db_conn' not in st.session_state or not st.session_state.db_conn:
+        if not JSON_FILE.exists():
             return pd.DataFrame(columns=["date", "module", "topic", "score", "total", "seconds", "accuracy"])
         
-        df = pd.read_sql_query("""
-            SELECT date, module, topic, score, total, seconds 
-            FROM quiz_results 
-            ORDER BY date DESC
-        """, st.session_state.db_conn)
+        with open(JSON_FILE, 'r') as f:
+            results = json.load(f)
         
-        if not df.empty:
-            df["date"] = pd.to_datetime(df["date"], errors="coerce")
-            df["accuracy"] = (df["score"] / df["total"]).clip(lower=0, upper=1)
-            print(f"✅ Loaded {len(df)} records from database")
-            return df
+        if results:
+            df = pd.DataFrame(results)
+            if not df.empty:
+                df["date"] = pd.to_datetime(df["date"], errors="coerce")
+                df["accuracy"] = (df["score"] / df["total"]).clip(lower=0, upper=1)
+                print(f"✅ Loaded {len(df)} records from JSON file")
+                return df
+                
     except Exception as e:
-        print(f"❌ Error loading from database: {e}")
+        print(f"❌ Error loading from JSON: {e}")
     
     return pd.DataFrame(columns=["date", "module", "topic", "score", "total", "seconds", "accuracy"])
+
+def clear_results():
+    """Clear all results from JSON file"""
+    try:
+        with open(JSON_FILE, 'w') as f:
+            json.dump([], f)
+        print("✅ Cleared all results from JSON file")
+        return True
+    except Exception as e:
+        print(f"❌ Error clearing results: {e}")
+        return False
 
 # ---------- Enhanced NVR Visual Enhancement Function ----------
 def enhance_nvr_display(text):
@@ -373,8 +378,7 @@ def reset_session():
 
 def clear_all_session():
     for key in list(st.session_state.keys()):
-        if key != 'db_conn':  # Don't clear database connection
-            del st.session_state[key]
+        del st.session_state[key]
 
 # ---------- Main App ----------
 st.set_page_config(
@@ -384,7 +388,7 @@ st.set_page_config(
     menu_items={
         'Get Help': 'https://streamlit.io',
         'Report a bug': None,
-        'About': "Elisa's 11+ Learning App - Mobile Optimized with SQLite Database"
+        'About': "Elisa's 11+ Learning App - Mobile Optimized with JSON Storage"
     }
 )
 
@@ -529,13 +533,17 @@ st.markdown("""
         max-width: 100% !important;
         overflow-x: hidden !important;
     }
+    /* Hide admin panel initially */
+    .admin-panel {
+        display: none;
+    }
     </style>
 """, unsafe_allow_html=True)
 
 st.markdown("""
 <div style="text-align: center; padding: 20px 0;">
     <h1 style="color: #2E8B57; margin-bottom: 10px;">🧠 11+ Practice App</h1>
-    <p style="color: #ccc; font-size: 18px;">Mobile-friendly learning for Elisaveta • SQLite Database</p>
+    <p style="color: #ccc; font-size: 18px;">Elisaveta's Mobile Friendly Learning Platofrm</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -558,105 +566,88 @@ else:
         st.error("❌ CSV file format is incorrect. Please check the required columns.")
     else:
         st.success("✅ App initialized successfully!")
-        if st.session_state.db_conn:
-            st.info(f"✅ Database connected: {DB_FILE}")
+        if JSON_FILE.exists():
+            df = load_results()
+            if not df.empty:
+                st.info(f"✅ Found {len(df)} quiz results")
 
 # ---------- Mode Selector ----------
 mode_type = st.sidebar.radio("Choose Mode", ["Kid Mode", "Parent Mode"], horizontal=True)
 if mode_type == "Kid Mode":
     page = st.sidebar.radio("Choose view", ["Quiz", "My Progress"], horizontal=True)
 else:
-    page = st.sidebar.radio("Choose view", ["Quiz", "Dashboard", "Data Info", "Predictive Analytics", "Debug"], horizontal=True)
+    # Removed "Data Info" and "Debug" from Parent Mode
+    page = st.sidebar.radio("Choose view", ["Quiz", "Dashboard", "Predictive Analytics"], horizontal=True)
 
-# ---------- Refresh Button ----------
+# ---------- Secret Admin Panel Activation ----------
 with st.sidebar:
     st.markdown("---")
+    
+    # Simple refresh button (always visible)
     if st.button("🔄 Refresh App", use_container_width=True, type="secondary"):
         clear_all_session()
         st.rerun()
-
-# ---------- Data Info ----------
-if page == "Data Info" and mode_type == "Parent Mode":
-    st.title("📊 Data Information")
-    try:
-        df = pd.read_csv(CSV_FILE)
-        st.success("✅ CSV file loaded successfully")
-
-        st.markdown("### Dataset Overview")
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.metric("Total Questions", len(df))
-            st.metric("Maths", len(df[df["Type"] == "Maths"]))
-        with col2:
-            st.metric("Vocabulary", len(df[df["Type"] == "Vocabulary"]))
-            st.metric("Verbal Reasoning", len(df[df["Type"] == "Verbal Reasoning"]))
-        with col3:
-            st.metric("NVR", len(df[df["Type"] == "Non-Verbal-Reasoning"]))
-
-        st.markdown("### Sample Questions (First 10)")
-        st.dataframe(df.head(10), use_container_width=True)
-
-        st.markdown("### Question Type Distribution")
-        type_counts = df["Type"].value_counts().reset_index()
-        type_counts.columns = ["Type", "Count"]
-        
-        chart = alt.Chart(type_counts).mark_bar().encode(
-            x='Type:N',
-            y='Count:Q',
-            color='Type:N',
-            tooltip=['Type', 'Count']
-        ).properties(
-            title="Question Types Distribution",
-            height=400
-        )
-        st.altair_chart(chart, use_container_width=True)
-        st.dataframe(type_counts, use_container_width=True)
-    except Exception as e:
-        st.error(f"Error loading CSV: {str(e)}")
-
-# ---------- Debug Page ----------
-elif page == "Debug" and mode_type == "Parent Mode":
-    st.title("🔧 Debug Information")
     
-    st.markdown("### Database Status")
-    if 'db_conn' in st.session_state and st.session_state.db_conn:
-        st.success("✅ Database connected")
-        
-        # Show table info
-        cursor = st.session_state.db_conn.cursor()
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-        tables = cursor.fetchall()
-        st.write("Tables in database:", tables)
-        
-        # Count records
-        cursor.execute("SELECT COUNT(*) FROM quiz_results")
-        count = cursor.fetchone()[0]
-        st.write(f"Total quiz records: {count}")
-        
-        # Show recent records
-        cursor.execute("SELECT * FROM quiz_results ORDER BY created_at DESC LIMIT 10")
-        recent = cursor.fetchall()
-        if recent:
-            st.write("Recent records:", recent)
-    else:
-        st.error("❌ Database not connected")
+    # Hidden admin panel - only appears after clicking "Help" 3 times
+    if 'help_clicks' not in st.session_state:
+        st.session_state.help_clicks = 0
     
-    st.markdown("### File System Info")
-    st.write(f"Current directory: {Path.cwd()}")
-    st.write(f"BASE_DIR: {BASE_DIR}")
-    st.write(f"DB_FILE path: {DB_FILE}")
-    st.write(f"DB_FILE exists: {DB_FILE.exists()}")
+    # Add a small, inconspicuous "Help" link
+    col1, col2, col3 = st.columns([2, 1, 2])
+    with col2:
+        if st.button("❓", help="Click for help", use_container_width=False):
+            st.session_state.help_clicks += 1
     
-    if DB_FILE.exists():
-        st.write(f"File size: {DB_FILE.stat().st_size} bytes")
-        st.write(f"Last modified: {datetime.datetime.fromtimestamp(DB_FILE.stat().st_mtime)}")
-    
-    st.markdown("### Session State")
-    session_keys = list(st.session_state.keys())
-    st.write(f"Session keys: {session_keys}")
+    # Show admin panel after 3 clicks on the help button
+    if st.session_state.help_clicks >= 3:
+        st.markdown("---")
+        st.markdown("### 🔒 Admin Panel (Hidden)")
+        st.warning("⚠️ **Parent Access Only** - Be careful with these options!")
+        
+        # Show current data stats
+        if JSON_FILE.exists():
+            try:
+                with open(JSON_FILE, 'r') as f:
+                    results = json.load(f)
+                st.info(f"**Currently stored:** {len(results)} quiz results")
+                
+                # Download button
+                if results:
+                    json_str = json.dumps(results, indent=2)
+                    st.download_button(
+                        label="📥 Backup Quiz Data",
+                        data=json_str,
+                        file_name=f"elisa_quiz_backup_{datetime.date.today()}.json",
+                        mime="application/json",
+                        use_container_width=True
+                    )
+                
+                # Clear data with confirmation
+                if st.button("🗑️ Clear All Quiz Data", use_container_width=True, type="secondary"):
+                    # Double confirmation
+                    st.error("⚠️ **WARNING: This will delete ALL quiz data permanently!**")
+                    confirm = st.checkbox("I understand this cannot be undone")
+                    password = st.text_input("Enter 'DELETE' to confirm", type="password")
+                    
+                    if st.button("🚨 PERMANENTLY DELETE ALL DATA", type="primary", use_container_width=True):
+                        if confirm and password == "DELETE":
+                            if clear_results():
+                                st.success("✅ All data cleared!")
+                                st.session_state.help_clicks = 0  # Reset click counter
+                                st.rerun()
+                        else:
+                            st.error("❌ Confirmation failed. Data NOT deleted.")
+                
+                # Reset click counter
+                if st.button("Hide Admin Panel", use_container_width=True):
+                    st.session_state.help_clicks = 0
+                    st.rerun()
+                    
+            except Exception as e:
+                st.error(f"Error accessing data: {e}")
 
 # ---------- Quiz ----------
-elif page == "Quiz":
+if page == "Quiz":
     if "questions" not in st.session_state:
         reset_session()
 
@@ -1136,6 +1127,6 @@ elif page == "Predictive Analytics" and mode_type == "Parent Mode":
 st.markdown("---")
 st.markdown("""
 <div style="text-align: center; color: #888; font-size: 14px; padding: 20px 0;">
-    Made with ❤️ for Elisaveta | Streamlit Cloud | SQLite Database | Mobile Optimized
+    Made with ❤️ for Elisaveta | Streamlit Cloud | JSON Storage | Mobile Optimized
 </div>
 """, unsafe_allow_html=True)
